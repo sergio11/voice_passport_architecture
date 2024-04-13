@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import logging
 import os
+from minio_helpers import get_minio_client, store_file_in_minio
+from api_helpers import create_response
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,3 +24,12 @@ MINIO_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME")
 
 # Create a Flask application
 app = Flask(__name__)
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    logger.error(f"An error occurred: {str(e)}")
+    return create_response("Error", 500, "An internal server error occurred")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
