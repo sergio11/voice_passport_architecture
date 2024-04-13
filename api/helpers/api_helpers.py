@@ -2,6 +2,8 @@ import os
 import tempfile
 from flask import jsonify
 
+ALLOWED_EXTENSIONS = {'wav'}
+
 def create_response(status, code, message, data=None):
     """
     Creates a JSON response to send to the client.
@@ -36,3 +38,8 @@ def save_file_locally(file):
 def cleanup_temp_file(temp_file_path):
     # Delete the temporary file
     os.unlink(temp_file_path)
+
+# Check if the filename has a valid extension present in the ALLOWED_EXTENSIONS set
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

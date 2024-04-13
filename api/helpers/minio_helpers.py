@@ -1,6 +1,31 @@
+import os
+import uuid
 from minio import Minio
 
-def get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name):
+# MinIO configuration
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
+MINIO_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME")
+
+# Function to handle MinIO storage for the file
+def handle_minio_storage(file, temp_file_path):
+    # Get the file extension from the uploaded file
+    file_extension = os.path.splitext(file.filename)[1]
+    # Generate a unique name for the file in MinIO using UUID and the file extension
+    unique_filename = f"{str(uuid.uuid4())}{file_extension}"
+    # Store the video file in MinIO
+    _store_file_in_minio(
+        minio_endpoint=MINIO_ENDPOINT,
+        minio_access_key=MINIO_ACCESS_KEY,
+        minio_secret_key=MINIO_SECRET_KEY,
+        minio_bucket_name=MINIO_BUCKET_NAME,
+        local_file_path=temp_file_path,
+        minio_object_name=unique_filename
+    )
+    return unique_filename
+
+def _get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name):
     """
     Establishes a connection with MinIO and returns a MinIO client.
 
@@ -31,7 +56,7 @@ def get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_b
         error_message = f"Error connecting to MinIO: {e}"
         raise Exception(error_message)
         
-def store_file_in_minio(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name, local_file_path, minio_object_name, content_type=None):
+def _store_file_in_minio(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name, local_file_path, minio_object_name, content_type=None):
     """
     Stores a file in MinIO.
 
