@@ -56,7 +56,7 @@ class VoiceEmbeddingOperator(BaseCustomOperator):
 
     def execute(self, context):
         # Log the start of the execution
-        self._log_to_mongodb(f"Starting execution of TranscriptionOperator", context, "INFO")
+        self._log_to_mongodb(f"Starting execution of VoiceEmbeddingOperator", context, "INFO")
         # Get the configuration passed to the DAG from the execution context
         dag_run_conf = context['dag_run'].conf
 
