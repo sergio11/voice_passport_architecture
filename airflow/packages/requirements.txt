@@ -8,3 +8,6 @@ connexion==2.14.2
 apache-airflow==2.7.1
 pymongo==4.0.1
 minio==7.1.17
+Resemblyzer==0.1.4
+numpy==1.26.4
+qdrant-client==1.8.2
