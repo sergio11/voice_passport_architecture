@@ -2,7 +2,7 @@ import os
 import tempfile
 from flask import jsonify
 
-ALLOWED_EXTENSIONS = {'wav'}
+ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
 def create_response(status, code, message, data=None):
     """

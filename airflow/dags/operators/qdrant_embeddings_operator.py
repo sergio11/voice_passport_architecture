@@ -2,7 +2,7 @@ from airflow.utils.decorators import apply_defaults
 from operators.base_custom_operator import BaseCustomOperator
 import qdrant_client
 
-class QDrantOperator(BaseCustomOperator):
+class QDrantEmbeddingsOperator(BaseCustomOperator):
 
     @apply_defaults
     def __init__(
@@ -46,7 +46,7 @@ class QDrantOperator(BaseCustomOperator):
        self._log_to_mongodb(f"Received user_id: {user_id}", context, "INFO")
        embeddings = dag_run_conf['embeddings']
        try:
-             # Initialize QDrant client
+            # Initialize QDrant client
             client = self._initialize_qdrant_client()
 
             # Create or verify the existence of the collection
