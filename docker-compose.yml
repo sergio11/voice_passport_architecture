@@ -1,0 +1,259 @@
+version: '3.6'
+
+# Define named volumes for persistent data
+volumes:
+  apache-airflow_data:
+    driver: local
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  mongo_data:
+    driver: local
+  minio-data-1:
+    driver: local
+  minio-data-2:
+    driver: local
+  minio-data-3:
+    driver: local
+
+networks:
+  voice_passport_network:
+
+services:
+
+  voice_passport_minio1:
+    image: minio/minio
+    container_name: voice-passport-minio-1
+    env_file:
+      - .env
+    volumes:
+      - minio-data-1:/data
+    command: server http://voice-passport-minio-{1...3}/data
+    networks:
+      - voice_passport_network
+
+  voice_passport_minio2:
+    image: minio/minio
+    container_name: voice-passport-minio-2
+    env_file:
+      - .env
+    volumes:
+      - minio-data-2:/data
+    command: server http://voice-passport-minio-{1...3}/data
+    networks:
+      - voice_passport_network
+
+  voice_passport_minio3:
+    image: minio/minio
+    container_name: voice-passport-minio-3
+    env_file:
+      - .env
+    volumes:
+      - minio-data-3:/data
+    command: server http://voice-passport-minio-{1...3}/data
+    networks:
+      - voice_passport_network
+
+  voice_passport_minio_haproxy:
+    image: haproxytech/haproxy-alpine:2.7
+    container_name: voice-passport-minio-haproxy
+    volumes:
+      - ./haproxy/minio/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - '9000:9000'
+      - '1936:1936'
+    networks:
+      - voice_passport_network
+
+  # MongoDB container for Apache Airflow
+  voice_passport_mongo:
+    container_name: voice-passport-mongo
+    image: mongo
+    env_file:
+      - .env
+    ports:
+      - "27017:27017"
+    networks:
+      - voice_passport_network
+
+  # Web-based MongoDB admin interface, written with Node.js and express
+  voice_passport_mongo_express:
+    image: mongo-express
+    container_name: voice-passport-mongo-express
+    restart: on-failure
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_mongo
+    ports:
+      - "9001:8081"
+    networks:
+      - voice_passport_network
+
+  # Redis container for Apache Airflow's message broker
+  voice_passport_redis:
+    image: redis:5.0.5
+    container_name: voice-passport-redis
+    restart: always
+    networks:
+      - voice_passport_network
+    
+  # PostgreSQL database container for Apache Airflow
+  voice_passport_postgres:
+    image: postgres:13
+    container_name: voice-passport-postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - voice_passport_network
+
+  # pgAdmin container for managing the PostgreSQL database
+  voice_passport_pgadmin:
+    image: dpage/pgadmin4
+    container_name: voice-passport-pgadmin
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 9002:80
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin
+    networks:
+      - voice_passport_network
+
+  # Apache Airflow webserver container
+  voice_passport_airflow_webserver:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-airflow-webserver
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_postgres
+      - voice_passport_redis
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/packages:/usr/local/airflow/packages
+    ports:
+      - "9003:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - voice_passport_network
+
+  # Flower is a web-based tool for monitoring and administrating Celery clusters.
+  voice_passport_celery_flower:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-celery-flower
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_redis
+    volumes:
+      - ./airflow/packages:/usr/local/airflow/packages
+    ports:
+      - "9004:5555"
+      - "9005:8080"
+      - "9006:8793"
+    command: flower
+    networks:
+      - voice_passport_network
+
+  # Apache Airflow scheduler container
+  voice_passport_airflow_scheduler:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-airflow-scheduler
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_airflow_webserver
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/packages:/usr/local/airflow/packages
+    ports:
+      - "9007:8080"
+    command: scheduler
+    networks:
+      - voice_passport_network
+
+  # Apache Airflow worker containers
+  voice_passport_airflow_worker_1:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-airflow-worker-1
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_airflow_scheduler
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/packages:/usr/local/airflow/packages
+    command: worker
+    networks:
+      - voice_passport_network
+
+  # Apache Airflow worker containers
+  voice_passport_airflow_worker_2:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-airflow-worker-2
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_airflow_scheduler
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/packages:/usr/local/airflow/packages
+    command: worker
+    networks:
+      - voice_passport_network
+
+  # VoicePassport API Service
+  voice_passport_api_service_1:
+    image: ssanchez11/voice_passport_api_service:0.0.1
+    container_name: voice-passport-api-service-1
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - voice_passport_network
+
+  # VoicePassport API Service
+  voice_passport_api_service_2:
+    image: ssanchez11/voice_passport_api_service:0.0.1
+    container_name: voice-passport-api-service-2
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - voice_passport_network
+
+  # VoicePassport API Service
+  voice_passport_api_service_3:
+    image: ssanchez11/voice_passport_api_service:0.0.1
+    container_name: voice-passport-api-service-3
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - voice_passport_network
+
+  voice_passport_api_service_haproxy:
+    image: haproxytech/haproxy-alpine:2.7
+    container_name: voice-passport-service-haproxy
+    volumes:
+      - ./haproxy/orchestrator/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - '9008:5000'
+      - '1937:1936'
+    networks:
+      - voice_passport_network
