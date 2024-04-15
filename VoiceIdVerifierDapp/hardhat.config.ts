@@ -19,8 +19,8 @@ const config: HardhatUserConfig = {
       gas: 2100000,
       gasPrice: 8000000000
     },
-    mumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${secret.projectId}`,
+    sepolia: {
+      url: `https://eth-sepolia.g.alchemy.com/v2/${secret.projectId}`,
       accounts: [secret.accountPrivateKey]
     }
   }
