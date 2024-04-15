@@ -11,9 +11,6 @@ contract VoiceIDVerifier is Ownable, IVoiceIDVerifier {
     // Mapping to store voice ID verification information
     mapping(string => VoiceIDVerification) public voiceIDVerifications;
 
-    // Constructor to initialize the contract
-    constructor() Ownable(msg.sender) {}
-
     // Function to register a new voice ID verification
     function registerVoiceIDVerification(string memory _userHash, string memory _audioHash) external override onlyOwner {
         // Store the voice ID verification information
