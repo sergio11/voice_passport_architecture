@@ -19,6 +19,11 @@ describe("VoiceIDVerifier", function () {
     return { voiceIDVerifierContractInstance, owner, addr1, addr2 }
   }
 
+  function generateHash() {
+    const uuid = uuidv4();
+    return CryptoJS.SHA256(uuid).toString(CryptoJS.enc.Hex);
+  }
+
   it("Should set the right owner", async function () {
     const { voiceIDVerifierContractInstance, owner } = await deployContractFixture()
     expect(await voiceIDVerifierContractInstance.owner()).to.equal(owner.address)
@@ -26,21 +31,42 @@ describe("VoiceIDVerifier", function () {
 
   it("register voiceID verification successfully", async function () {
     const { voiceIDVerifierContractInstance, owner } = await deployContractFixture()
-    // Generate UUID for the user and for the audio
-    const userUUID = uuidv4();
-    const audioUUID = uuidv4();
+    const userHash = generateHash();
+    const audioHash = generateHash();
 
-    // Generate hashes for the user and the audio
-    const userHash = CryptoJS.SHA256(userUUID).toString(CryptoJS.enc.Hex);
-    const audioHash = CryptoJS.SHA256(audioUUID).toString(CryptoJS.enc.Hex);
+    await voiceIDVerifierContractInstance.connect(owner).registerVoiceIDVerification(userHash, audioHash);
+    const isValid = await voiceIDVerifierContractInstance.connect(owner).verifyVoiceID(userHash, audioHash);
 
-    // Register voice identity verification
-    let tx = await voiceIDVerifierContractInstance.connect(owner).registerVoiceIDVerification(userHash, audioHash);
-    let receipt = await tx.wait()
-    let events = receipt.events?.map((x) => x.event)
+    expect(isValid).to.be.true;
+  });
 
-    expect(events).to.be.an('array').that.is.not.empty
-    expect(events!![0]).to.equal("VoiceIDVerificationRegistered")
-    expect(await voiceIDVerifierContractInstance.owner()).to.equal(owner.address)
+
+  it("disable voiceID verification successfully", async function () {
+    const { voiceIDVerifierContractInstance, owner } = await deployContractFixture()
+    const userHash = generateHash();
+    const audioHash = generateHash();
+
+    await voiceIDVerifierContractInstance.connect(owner).registerVoiceIDVerification(userHash, audioHash);
+    let isValidBeforeDisabling = await voiceIDVerifierContractInstance.connect(owner).verifyVoiceID(userHash, audioHash);
+    await voiceIDVerifierContractInstance.connect(owner).disableVoiceIDVerification(audioHash);
+    let isValidAfterDisabling = await voiceIDVerifierContractInstance.connect(owner).verifyVoiceID(userHash, audioHash);
+
+    expect(isValidBeforeDisabling).to.be.true
+    expect(isValidAfterDisabling).to.be.false
+  });
+
+  it("enable voiceID verification successfully", async function () {
+    const { voiceIDVerifierContractInstance, owner } = await deployContractFixture()
+    const userHash = generateHash();
+    const audioHash = generateHash();
+
+    await voiceIDVerifierContractInstance.connect(owner).registerVoiceIDVerification(userHash, audioHash);
+    await voiceIDVerifierContractInstance.connect(owner).disableVoiceIDVerification(audioHash);
+    let isValidAfterDisabling = await voiceIDVerifierContractInstance.connect(owner).verifyVoiceID(userHash, audioHash);
+    await voiceIDVerifierContractInstance.connect(owner).enableVoiceIDVerification(audioHash);
+    let isValidAfterEnabling = await voiceIDVerifierContractInstance.connect(owner).verifyVoiceID(userHash, audioHash);
+
+    expect(isValidAfterDisabling).to.be.false
+    expect(isValidAfterEnabling).to.be.true
   });
 });
