@@ -69,4 +69,24 @@ describe("VoiceIDVerifier", function () {
     expect(isValidAfterDisabling).to.be.false
     expect(isValidAfterEnabling).to.be.true
   });
+
+  it("only the contract's owner can register and verify voice ids", async function () {
+    const { voiceIDVerifierContractInstance, owner, addr1 } = await deployContractFixture()
+    const userHash = generateHash();
+    const audioHash = generateHash();
+
+    var errorMessage: Error | null = null
+    try {
+      await voiceIDVerifierContractInstance.connect(addr1).registerVoiceIDVerification(userHash, audioHash);
+    const isValid = await voiceIDVerifierContractInstance.connect(addr1).verifyVoiceID(userHash, audioHash);
+    } catch(error) {
+      if (error instanceof Error) {
+        errorMessage = error
+      }
+    }
+
+    expect(errorMessage).not.be.null
+    expect(errorMessage!!.message).to.contain("Ownable: caller is not the owner")
+  });
+
 });
