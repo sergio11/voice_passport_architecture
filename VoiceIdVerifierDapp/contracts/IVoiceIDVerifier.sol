@@ -12,8 +12,8 @@ interface IVoiceIDVerifier {
     // Method to enable voice identity verification
     function enableVoiceIDVerification(string memory _userHash) external;
 
-    // Method to verify voice identity and return the user hash if valid
-    function verifyVoiceID(string memory _audioHash) external view returns (string memory);
+    // Method to verify voice identity and return true if valid
+    function verifyVoiceID(string memory _userHash, string memory _audioHash) external view returns (bool);
 
     // Event emitted when a new voice identity verification is registered
     event VoiceIDVerificationRegistered(

@@ -3,8 +3,10 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IVoiceIDVerifier.sol";
+import "./Utils.sol";
 
 contract VoiceIDVerifier is Ownable, IVoiceIDVerifier {
+    using Utils for string;
     
     // Mapping to store voice ID verification information
     mapping(string => VoiceIDVerification) public voiceIDVerifications;
@@ -33,12 +35,18 @@ contract VoiceIDVerifier is Ownable, IVoiceIDVerifier {
         voiceIDVerifications[_audioHash].isEnabled = true;
     }
 
-    // Function to verify voice ID and return the user hash if valid
-    function verifyVoiceID(string memory _audioHash) external view override returns (string memory) {
-        // Check if voice ID verification is enabled
-        require(voiceIDVerifications[_audioHash].isEnabled, "Voice ID verification is disabled");
-
-        // Return the user hash associated with the audio hash
-        return voiceIDVerifications[_audioHash].userHash;
+    // Method to verify voice identity and return true if valid
+    function verifyVoiceID(string memory _userHash, string memory _audioHash) external view returns (bool) {
+        // Retrieve the voice ID verification information for the given audio hash
+        VoiceIDVerification memory voiceIDVerification = voiceIDVerifications[_audioHash];
+        
+        // Check if the voice ID verification information exists and is enabled
+        if (voiceIDVerification.userHash.compareStrings(_userHash) && voiceIDVerification.isEnabled) {
+            // Voice authentication successful
+            return true;
+        } else {
+            // Voice authentication failed
+            return false;
+        }
     }
 }
