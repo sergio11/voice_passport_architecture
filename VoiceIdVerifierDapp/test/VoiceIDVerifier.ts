@@ -88,5 +88,4 @@ describe("VoiceIDVerifier", function () {
     expect(errorMessage).not.be.null
     expect(errorMessage!!.message).to.contain("Ownable: caller is not the owner")
   });
-
 });
