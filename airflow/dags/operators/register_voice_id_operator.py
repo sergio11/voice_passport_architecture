@@ -7,7 +7,7 @@ import hashlib
 
 class RegisterVoiceIDOperator(BaseOperator):
     """
-    Operator to register VoiceID using a Smart Contract.
+    Operator to register a VoiceID by interacting with a Smart Contract on the blockchain.
     """
     @apply_defaults
     def __init__(

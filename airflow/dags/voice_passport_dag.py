@@ -18,6 +18,8 @@ with DAG('voice_passport_dag', default_args=default_args, default_view="graph", 
     VoiceEmbeddingOperator = operators_module.VoiceEmbeddingOperator
     operators_module = importlib.import_module('operators.qdrant_embeddings_operator')
     QDrantEmbeddingsOperator = operators_module.QDrantEmbeddingsOperator
+    operators_module = importlib.import_module('operators.register_voice_id_operator')
+    RegisterVoiceIDOperator = operators_module.RegisterVoiceIDOperator
 
     # Define the task instances for each operator
 
@@ -48,5 +50,21 @@ with DAG('voice_passport_dag', default_args=default_args, default_view="graph", 
         minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
     )
 
+    # Define a task to register a VoiceID using a Smart Contract.
+    register_voice_task = RegisterVoiceIDOperator(
+        task_id='register_voice_task',
+        http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER"),
+        caller_address=os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS"),
+        caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
+        contract_address=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS"),
+        mongo_uri=os.environ.get("MONGO_URI"),
+        mongo_db=os.environ.get("MONGO_DB"),
+        mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
+        minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
+        minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
+        minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+    )
+
     # Define task dependencies by chaining the tasks in sequence
-    voice_embedding_task >> qdrant_embeddings_task
+    voice_embedding_task >> qdrant_embeddings_task >> register_voice_task
