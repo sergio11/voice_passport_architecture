@@ -81,7 +81,7 @@ def _store_file_in_minio(minio_endpoint, minio_access_key, minio_secret_key, min
                 error_message = f"File '{local_file_path}' is empty"
                 raise Exception(error_message)
             # Get MinIO client
-            minio_client = get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name)
+            minio_client = _get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name)
             minio_client.put_object(
                 bucket_name=minio_bucket_name,
                 object_name=minio_object_name,
