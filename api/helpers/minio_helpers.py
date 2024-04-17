@@ -9,11 +9,9 @@ MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
 MINIO_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME")
 
 # Function to handle MinIO storage for the file
-def handle_minio_storage(file, temp_file_path):
-    # Get the file extension from the uploaded file
-    file_extension = os.path.splitext(file.filename)[1]
-    # Generate a unique name for the file in MinIO using UUID and the file extension
-    unique_filename = f"{str(uuid.uuid4())}{file_extension}"
+def handle_minio_storage(temp_file_path):
+    # Generate a unique name for the file in MinIO using UUID
+    unique_filename = str(uuid.uuid4())
     # Store the video file in MinIO
     _store_file_in_minio(
         minio_endpoint=MINIO_ENDPOINT,
