@@ -1,4 +1,5 @@
 import datetime
+import os
 from flask import Flask, request
 import logging
 from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
@@ -7,6 +8,8 @@ from helpers.api_helpers import cleanup_temp_file, create_response, extract_voic
 from helpers.airflow_helpers import trigger_airflow_dag
 from helpers.qdrant_helpers import search_most_similar_audio
 from helpers.voice_id_verifier_helpers import verifyVoiceID
+import jwt
+from datetime import datetime, timedelta, timezone
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 # Base prefix for application routes
 BASE_URL_PREFIX = "/api/voice-passport"
+
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
 # Create a Flask application
 app = Flask(__name__)
@@ -100,10 +105,15 @@ def signin_user():
 
     # Return a formatted response based on the verification result
     if verification_result:
+        # Generate JWT token with user ID as claim
+        token_expiry = datetime.now(timezone.utc) + timedelta(hours=1)  # Token expires in 1 hour
+        token_payload = {'user_id': str(user_info["_id"]), 'exp': token_expiry}
+        jwt_token = jwt.encode(token_payload, JWT_SECRET_KEY, algorithm='HS256')
         response_data = {
             "user_id": str(user_info["_id"]),
             "fullname": user_info["fullname"],
-            "email": user_info["email"]
+            "email": user_info["email"],
+            "token": jwt_token.decode('utf-8')  # Decode bytes to string
         }
         return create_response("Success", 200, "User signed in successfully.", user_info=response_data)
     else:
