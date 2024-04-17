@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 import logging
 from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date
 from helpers.minio_helpers import handle_minio_storage
-from helpers.api_helpers import cleanup_temp_file, create_response, allowed_file, save_file_locally
+from helpers.api_helpers import cleanup_temp_file, create_response, extract_voice_file_from_request, save_file_locally 
 from helpers.airflow_helpers import trigger_airflow_dag
 
 # Configure logging
@@ -18,41 +18,16 @@ app = Flask(__name__)
 
 app.route(f"{BASE_URL_PREFIX}/signup", methods=['POST'])
 def register_user():
-    # Check if the voice_file part is in the request
-    if 'voice_file' not in request.files:
-        # If not, log an error and return a response indicating the error
-        logger.error("No voice file part received")
-        return create_response("Error", 400, "No voice file part")
-    
-    # Retrieve the voice file from the request
-    voice_file = request.files['voice_file']
-
-    # Check if a file was selected
-    if voice_file.filename == '':
-        # If not, log an error and return a response indicating the error
-        logger.error("No audio file selected")
-        return create_response("Error", 400, "No audio file file")
-        
-    # Check if the file format is allowed (in this case, only WAV files are allowed)
-    if not allowed_file(voice_file.filename):
-        # If not, log an error and return a response indicating the error
-        logger.error("Invalid audio file format. Only WAV files are allowed.")
-        return create_response("Error", 400, "Invalid audio file format. Only WAV files are allowed.")
-    
-    logger.info(f"Received file: {voice_file.filename}")
-
+    voice_file = extract_voice_file_from_request(request, logger)
+    # Save the file locally
+    temp_file_path = save_file_locally(voice_file)
+    # Store the file in MinIO
+    minio_object_name = handle_minio_storage(voice_file, temp_file_path)
     fullname = request.form.get('fullname')
     email = request.form.get('email')
-
     if not all([fullname, email]):
         logger.error("Missing parameters")
         return create_response("Error", 400, "Missing parameters: fullname or email")
-
-    # Save the file locally
-    temp_file_path = save_file_locally(voice_file)
-
-    # Store the file in MinIO
-    minio_object_name = handle_minio_storage(voice_file, temp_file_path)
 
     # Save metadata about the user in MongoDB
     user_id = save_user_metadata(fullname, email, minio_object_name)
@@ -88,6 +63,15 @@ def register_user():
         logger.error(f"An error occurred during file proccessing : {str(e)}")
         delete_user_details(user_id)
         return create_response("Error", 500, "An error occurred during file proccessing")
+    
+app.route(f"{BASE_URL_PREFIX}/signin", methods=['POST'])
+def signin_user():
+    voice_file = extract_voice_file_from_request(request, logger)
+    # Save the file locally
+    temp_file_path = save_file_locally(voice_file)
+    # Clean up the temporary file
+    cleanup_temp_file(temp_file_path)
+
 
 @app.errorhandler(Exception)
 def handle_error(e):

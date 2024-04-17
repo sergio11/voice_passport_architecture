@@ -4,6 +4,32 @@ from flask import jsonify
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
+def extract_voice_file_from_request(request, logger):
+     # Check if the voice_file part is in the request
+    if 'voice_file' not in request.files:
+        # If not, log an error and return a response indicating the error
+        logger.error("No voice file part received")
+        return create_response("Error", 400, "No voice file part")
+    
+    # Retrieve the voice file from the request
+    voice_file = request.files['voice_file']
+
+    # Check if a file was selected
+    if voice_file.filename == '':
+        # If not, log an error and return a response indicating the error
+        logger.error("No audio file selected")
+        return create_response("Error", 400, "No audio file file")
+        
+    # Check if the file format is allowed (in this case, only WAV files are allowed)
+    if not allowed_file(voice_file.filename):
+        # If not, log an error and return a response indicating the error
+        logger.error("Invalid audio file format. Only WAV or MP3 files are allowed.")
+        return create_response("Error", 400, "Invalid audio file format. Only WAV files are allowed.")
+    
+    logger.info(f"Received file: {voice_file.filename}")
+
+    return voice_file
+
 def create_response(status, code, message, data=None):
     """
     Creates a JSON response to send to the client.
