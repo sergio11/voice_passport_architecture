@@ -10,14 +10,14 @@ MONGO_DB = os.environ.get("MONGO_DB")
 MONGO_COLLECTION = os.environ.get("MONGO_DB_COLLECTION")
 
 # Function to save metadata about the user in MongoDB
-def save_user_metadata(fullname, email, voice_file_id):
+def save_user_metadata(fullname, email, voice_id):
     # Generate a timestamp for the video upload
     timestamp = datetime.utcnow()
     # Create metadata to be stored in MongoDB
     metadata = {
         "fullname": fullname,
         "email": email,
-        "voice_file_id": voice_file_id,
+        "voice_id": voice_id,
         "timestamp": timestamp,
         "planned": False  # Initial status, not yet planned
     }
@@ -25,6 +25,20 @@ def save_user_metadata(fullname, email, voice_file_id):
     # Insert the metadata into the MongoDB collection and retrieve the user ID
     user_id = db_collection.insert_one(metadata).inserted_id
     return user_id
+
+def find_user_by_voice_id(voice_id):
+    """
+    Find user details by voice ID.
+
+    Parameters:
+    - voice_id (str): The voice ID of the user to search for.
+
+    Returns:
+    - dict or None: A dictionary containing the user details if found, or None if not found.
+    """
+    db_collection = _connect_to_mongo()  # Establish connection to MongoDB
+    user_info = db_collection.find_one({"voice_id": voice_id})  # Find user details by voice ID
+    return user_info
 
 def update_user_register_planned_date(user_id, logical_date):
     db_collection = _connect_to_mongo()
