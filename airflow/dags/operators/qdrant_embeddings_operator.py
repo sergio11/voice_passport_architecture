@@ -1,6 +1,6 @@
 from airflow.utils.decorators import apply_defaults
 from operators.base_custom_operator import BaseCustomOperator
-import qdrant_client
+from qdrant_client import QdrantClient, http
 
 class QDrantEmbeddingsOperator(BaseCustomOperator):
 
@@ -19,22 +19,25 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
 
     def _initialize_qdrant_client(self):
         # Initialize QDrant client
-        return qdrant_client.QdrantClient(url=self.qdrant_uri, api_key=self.qdrant_api_key)
+        return QdrantClient(url=self.qdrant_uri, api_key=self.qdrant_api_key)
 
     def _create_or_verify_collection(self, client):
-        # Check if the collection already exists
-        collections = client.list_collections()
-        if self.qdrant_collection not in collections:
+        # Get collections response
+        collections_response = client.get_collections()
+        # Extract collection names
+        collection_names = [collection.name for collection in collections_response.collections]
+        print(collection_names)
+        if self.qdrant_collection not in collection_names:
             # Create a collection with specified parameters
-            vectors_config = qdrant_client.http.models.VectorParams(
+            vectors_config = http.models.VectorParams(
                 size=256,  # Size required for embeddings from resemblyzer
-                distance=qdrant_client.http.models.Distance.COSINE
+                distance=http.models.Distance.COSINE
             )
             client.create_collection(self.qdrant_collection, vectors_config)
-
-    def _upsert_embeddings(self, client, embeddings):
+            
+    def _upsert_embeddings(self, client, id, embeddings):
         # Upsert embeddings into the collection
-        client.upsert(self.qdrant_collection, embeddings)
+        client.upsert(self.qdrant_collection, [{"id": id, "vector": embeddings.tolist()}])
 
     def execute(self, context):
        # Log the start of the execution
@@ -43,8 +46,12 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
        dag_run_conf = context['dag_run'].conf
        # Get the user_id and embeddings from the configuration
        user_id = dag_run_conf['user_id']
-       self._log_to_mongodb(f"Received user_id: {user_id}", context, "INFO")
        embeddings = dag_run_conf['embeddings']
+       self._log_to_mongodb(f"Received user_id: {user_id}", context, "INFO")
+       # Retrieve user information based on the user ID from MongoDB
+       user_info = self._get_user_info(context, user_id)
+       # Extract the voice file ID from the user information
+       voice_file_id = self._get_voice_id_from_user_info(context, user_info)
        try:
             # Initialize QDrant client
             client = self._initialize_qdrant_client()
@@ -53,7 +60,7 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
             self._create_or_verify_collection(client)
 
             # Upsert embeddings into the collection
-            self._upsert_embeddings(client, embeddings)
+            self._upsert_embeddings(client, voice_file_id, embeddings)
 
             # Log success
             self._log_to_mongodb(f"Embeddings successfully upserted into QDrant", context, "INFO")
