@@ -1,10 +1,12 @@
 import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import logging
-from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date
+from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
 from helpers.minio_helpers import handle_minio_storage
 from helpers.api_helpers import cleanup_temp_file, create_response, extract_voice_file_from_request, save_file_locally 
 from helpers.airflow_helpers import trigger_airflow_dag
+from helpers.qdrant_helpers import search_most_similar_audio
+from helpers.voice_id_verifier_helpers import verifyVoiceID
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +19,7 @@ BASE_URL_PREFIX = "/api/voice-passport"
 app = Flask(__name__)
 
 app.route(f"{BASE_URL_PREFIX}/signup", methods=['POST'])
-def register_user():
+def signup_user():
     voice_file = extract_voice_file_from_request(request, logger)
     # Save the file locally
     temp_file_path = save_file_locally(voice_file)
@@ -64,14 +66,48 @@ def register_user():
         delete_user_details(user_id)
         return create_response("Error", 500, "An error occurred during file proccessing")
     
-app.route(f"{BASE_URL_PREFIX}/signin", methods=['POST'])
+
+@app.route(f"{BASE_URL_PREFIX}/signin", methods=['POST'])
 def signin_user():
+    """
+    Sign in a user by verifying their voice ID against stored voice ID hashes.
+
+    This endpoint receives a voice file from the request, searches for the most similar
+    voice ID in the system, retrieves the corresponding user, and verifies their voice ID.
+
+    Returns:
+    - dict: A dictionary containing the result of the verification process.
+            Example: {'success': True, 'message': 'User signed in successfully.',
+                      'user_info': {'user_id': '12345', 'fullname': 'John Doe', 'email': 'john@example.com'}}
+    """
+    # Extract voice file from the request
     voice_file = extract_voice_file_from_request(request, logger)
-    # Save the file locally
+    
+    # Save the voice file locally
     temp_file_path = save_file_locally(voice_file)
-    # Clean up the temporary file
+    
+    # Search for the most similar audio in the system and retrieve the associated voice ID
+    voice_id = search_most_similar_audio(temp_file_path)
+
+    # Find the user associated with the retrieved voice ID
+    user_info = find_user_by_voice_id(voice_id)
+
+    # Verify the user's voice ID
+    verification_result = verifyVoiceID(user_info["_id"], voice_id)
+
+    # Clean up the temporary voice file
     cleanup_temp_file(temp_file_path)
 
+    # Return a formatted response based on the verification result
+    if verification_result:
+        response_data = {
+            "user_id": str(user_info["_id"]),
+            "fullname": user_info["fullname"],
+            "email": user_info["email"]
+        }
+        return create_response("Success", 200, "User signed in successfully.", user_info=response_data)
+    else:
+        return create_response("Forbidden", 403, "Access denied.")
 
 @app.errorhandler(Exception)
 def handle_error(e):
