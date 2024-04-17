@@ -22,7 +22,7 @@ def register_user():
     # Save the file locally
     temp_file_path = save_file_locally(voice_file)
     # Store the file in MinIO
-    minio_object_name = handle_minio_storage(voice_file, temp_file_path)
+    minio_object_name = handle_minio_storage(temp_file_path)
     fullname = request.form.get('fullname')
     email = request.form.get('email')
     if not all([fullname, email]):
