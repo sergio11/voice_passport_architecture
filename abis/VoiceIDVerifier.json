@@ -51,6 +51,32 @@
 			{
 				"indexed": true,
 				"internalType": "string",
+				"name": "userHash",
+				"type": "string"
+			}
+		],
+		"name": "VoiceIDVerificationDisabled",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "userHash",
+				"type": "string"
+			}
+		],
+		"name": "VoiceIDVerificationEnabled",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
 				"name": "audioHash",
 				"type": "string"
 			},
@@ -68,7 +94,7 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_audioHash",
+				"name": "_userHash",
 				"type": "string"
 			}
 		],
@@ -81,7 +107,7 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_audioHash",
+				"name": "_userHash",
 				"type": "string"
 			}
 		],
