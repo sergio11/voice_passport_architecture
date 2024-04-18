@@ -1,5 +1,7 @@
 # VoicePassport: Your Trusted Voice Authentication Companion 🎙️🔒
 
+<img width="auto" height="250px" align="left" src="./doc/voice_passport_logo.PNG" />
+
 🔒🗣️ VoicePassport isa  robust and secure voice authentication system designed to ensure the authenticity of users through their unique voiceprints. Powered by Resemblyzer, VoicePassport leverages advanced voice processing technology to generate voice embeddings, which are compact numerical representations of voice characteristics. These embeddings capture the distinctive features of an individual's voice in a highly accurate and secure manner.
 
 🔍🔐 Using these voice embeddings, VoicePassport employs a similarity search mechanism to authenticate users. By comparing the voice embeddings extracted from an input voice sample with those stored in its database, VoicePassport can determine the likelihood of a match, thereby verifying the identity of the user.
