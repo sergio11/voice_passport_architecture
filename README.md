@@ -100,7 +100,76 @@ The vector database plays a crucial role in the voice authentication system, and
 In summary, QDrant provides a comprehensive and highly efficient solution for managing the vector database in our voice authentication system. Its scalability, performance, security, and integration capabilities make it the ideal choice to meet the storage and search needs of voice vectors in a robust and secure voice authentication environment.
 
 ## Installation
-To install VoicePassport, simply clone the repository and follow the installation instructions in the [documentation](docs/installation.md).
+
+
+### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
+
+The first step is to clone the repository and execute the following command  directory to install all the required modules
+
+```
+cd VoiceIdVerifierDapp && npm install
+```
+
+After that it will be necessary to create an account in Alchemy, infura or another similar service in order to configure the network on which the Dapp will be deployed.
+
+In my case, I have created a project in Alchemy and I have created a `secret.json` file to configure the deployment over the Mumbai testnet as you can see in the `hardhat.config.ts` file of the project:
+
+```
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+const secret = require('./.secret.json');
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.9",
+    settings: {
+      optimizer: {
+        enabled: true,
+      },
+    },
+  },
+  networks: {
+    hardhat: {},
+    ganache: {
+      url: "http://127.0.0.1:7545",
+      allowUnlimitedContractSize: true,
+      gas: 2100000,
+      gasPrice: 8000000000
+    },
+    amoy: {
+      url: `https://polygon-amoy.g.alchemy.com/v2/${secret.projectId}`,
+      accounts: [secret.accountPrivateKey]
+    }
+  }
+};
+
+export default config;
+```
+
+## Running the test suite
+
+The project has a set of tests to validate the correct behaviour of the contracts and the interaction between them.
+You can run the following command to launch the test suite on the local EVM:
+
+```
+cd VoiceIdVerifierDapp && npx hardhat test
+```
+
+You can also use ganache to carry out the tests, for this it is only necessary to use the network option
+
+```
+npx hardhat --network ganache test
+```
+
+## Deploying contracts
+
+You can target any network from your Hardhat config using:
+
+```
+npx hardhat run --network <network-name> scripts/deploy.ts
+```
+
+The project has been deployed on the Mumbai testnet, the addresses of the contracts are as follows:
 
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
