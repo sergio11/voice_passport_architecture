@@ -21,6 +21,16 @@ interface IVoiceIDVerifier {
         string indexed userHash
     );
 
+    // Event emitted when voice identity verification is enabled for a user
+    event VoiceIDVerificationEnabled(
+        string indexed userHash
+    );
+
+    // Event emitted when voice identity verification is disabled for a user
+    event VoiceIDVerificationDisabled(
+        string indexed userHash
+    );
+
     // Struct to store voice identity verification information
     struct VoiceIDVerification {
         string userHash;
