@@ -7,7 +7,7 @@ from helpers.minio_helpers import handle_minio_storage
 from helpers.api_helpers import cleanup_temp_file, create_response, extract_voice_file_from_request, save_file_locally 
 from helpers.airflow_helpers import trigger_airflow_dag
 from helpers.qdrant_helpers import search_most_similar_audio
-from helpers.voice_id_verifier_helpers import verifyVoiceID
+from helpers.voice_id_verifier_helpers import verify_voice_id, change_voice_id_verification_state
 import jwt
 from datetime import datetime, timedelta, timezone
 
@@ -98,7 +98,7 @@ def signin_user():
     user_info = find_user_by_voice_id(voice_id)
 
     # Verify the user's voice ID
-    verification_result = verifyVoiceID(user_info["_id"], voice_id)
+    verification_result = verify_voice_id(user_info["_id"], voice_id)
 
     # Clean up the temporary voice file
     cleanup_temp_file(temp_file_path)
@@ -142,8 +142,7 @@ def enable_user(user_id):
             decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
             # Check if user ID in JWT matches the user ID provided in the URL
             if decoded_token.get('user_id') == user_id:
-                
-                
+                change_voice_id_verification_state(user_id=user_id, is_enabled=True)
                 return {"success": True, "message": f"User with ID {user_id} enabled successfully."}, 200
             else:
                 return {"success": False, "message": "Unauthorized access."}, 401
@@ -176,8 +175,7 @@ def disable_user(user_id):
             decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
             # Check if user ID in JWT matches the user ID provided in the URL
             if decoded_token.get('user_id') == user_id:
-                
-
+                change_voice_id_verification_state(user_id=user_id, is_enabled=False)
                 return {"success": True, "message": f"User with ID {user_id} disabled successfully."}, 200
             else:
                 return {"success": False, "message": "Unauthorized access."}, 401
