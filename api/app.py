@@ -119,6 +119,75 @@ def signin_user():
     else:
         return create_response("Forbidden", 403, "Access denied.")
 
+
+@app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/enable", methods=['PUT'])
+def enable_user(user_id):
+    """
+    Enable a user identified by user_id.
+
+    This endpoint enables a user by setting their status to 'enabled' in the system.
+
+    Parameters:
+    - user_id (str): The ID of the user to enable.
+
+    Returns:
+    - dict: A dictionary containing the result of the operation.
+    """
+    # Get JWT token from the request headers
+    jwt_token = request.headers.get('Authorization')
+
+    # Verify JWT token
+    if jwt_token:
+        try:
+            decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
+            # Check if user ID in JWT matches the user ID provided in the URL
+            if decoded_token.get('user_id') == user_id:
+                
+                
+                return {"success": True, "message": f"User with ID {user_id} enabled successfully."}, 200
+            else:
+                return {"success": False, "message": "Unauthorized access."}, 401
+        except jwt.ExpiredSignatureError:
+            return {"success": False, "message": "JWT token expired."}, 401
+        except jwt.InvalidTokenError:
+            return {"success": False, "message": "Invalid JWT token."}, 401
+    else:
+        return {"success": False, "message": "JWT token missing."}, 401
+
+@app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/disable", methods=['PUT'])
+def disable_user(user_id):
+    """
+    Disable a user identified by user_id.
+
+    This endpoint disables a user by setting their status to 'disabled' in the system.
+
+    Parameters:
+    - user_id (str): The ID of the user to disable.
+
+    Returns:
+    - dict: A dictionary containing the result of the operation.
+    """
+    # Get JWT token from the request headers
+    jwt_token = request.headers.get('Authorization')
+
+    # Verify JWT token
+    if jwt_token:
+        try:
+            decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
+            # Check if user ID in JWT matches the user ID provided in the URL
+            if decoded_token.get('user_id') == user_id:
+                
+
+                return {"success": True, "message": f"User with ID {user_id} disabled successfully."}, 200
+            else:
+                return {"success": False, "message": "Unauthorized access."}, 401
+        except jwt.ExpiredSignatureError:
+            return {"success": False, "message": "JWT token expired."}, 401
+        except jwt.InvalidTokenError:
+            return {"success": False, "message": "Invalid JWT token."}, 401
+    else:
+        return {"success": False, "message": "JWT token missing."}, 401
+
 @app.errorhandler(Exception)
 def handle_error(e):
     logger.error(f"An error occurred: {str(e)}")
