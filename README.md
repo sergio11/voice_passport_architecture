@@ -104,10 +104,10 @@ In summary, QDrant provides a comprehensive and highly efficient solution for ma
 
 ### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
 
-The first step is to clone the repository and execute the following command  directory to install all the required modules
+The first step is to clone the repository and execute the following command directory to install all the required modules
 
 ```
-cd VoiceIdVerifierDapp && npm install
+rake voicepassport:dapp:install_dependencies
 ```
 
 After that it will be necessary to create an account in Alchemy, infura or another similar service in order to configure the network on which the Dapp will be deployed.
@@ -146,31 +146,38 @@ const config: HardhatUserConfig = {
 export default config;
 ```
 
-## Running the test suite
-
 The project has a set of tests to validate the correct behaviour of the contracts and the interaction between them.
 You can run the following command to launch the test suite on the local EVM:
 
 ```
-cd VoiceIdVerifierDapp && npx hardhat test
+rake voicepassport:dapp:run_tests
 ```
 
-You can also use ganache to carry out the tests, for this it is only necessary to use the network option
-
 ```
-npx hardhat --network ganache test
-```
+VoiceIDVerifier
+    ✔ Should set the right owner (3173ms)
+    ✔ register voiceID verification successfully (181ms)
+    ✔ disable voiceID verification successfully (164ms)
+    ✔ enable voiceID verification successfully (170ms)
+    ✔ only the contract's owner can register and verify voice ids (112ms)
 
-## Deploying contracts
 
-You can target any network from your Hardhat config using:
-
-```
-npx hardhat run --network <network-name> scripts/deploy.ts
+  5 passing (4s)
 ```
 
-The project has been deployed on the Mumbai testnet, the addresses of the contracts are as follows:
 
+You can deploy your own VoiceIdVerifier DApp instance using the following command:
+
+```
+rake voicepassport:dapp:deploy_contracts
+```
+
+The project has been deployed on the Polygon PoS Amoy testnet, the address of the contract is as follows:
+
+```
+cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
+VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
+```
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
