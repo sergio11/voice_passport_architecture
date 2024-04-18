@@ -23,6 +23,36 @@ def handle_minio_storage(temp_file_path):
     )
     return unique_filename
 
+def get_file_from_minio(minio_object_name):
+    """
+    Retrieves a file from MinIO based on its object name.
+
+    Args:
+    - minio_object_name (str): The name of the object in MinIO.
+
+    Returns:
+    - bytes: The binary data of the file if it exists in MinIO.
+
+    Raises:
+    - Exception: If there's an error during the MinIO file retrieval process.
+    """
+    try:
+        # Get MinIO client
+        minio_client = _get_minio_client(
+            minio_endpoint=MINIO_ENDPOINT,
+            minio_access_key=MINIO_ACCESS_KEY,
+            minio_secret_key=MINIO_SECRET_KEY,
+            minio_bucket_name=MINIO_BUCKET_NAME
+        )
+        # Retrieve the file from MinIO
+        response = minio_client.get_object(MINIO_BUCKET_NAME, minio_object_name)
+        # Read and return the file data
+        file_data = response.read()
+        return file_data
+    except Exception as e:
+        error_message = f"Error retrieving file '{minio_object_name}' from MinIO: {e}"
+        raise Exception(error_message)
+
 def _get_minio_client(minio_endpoint, minio_access_key, minio_secret_key, minio_bucket_name):
     """
     Establishes a connection with MinIO and returns a MinIO client.
