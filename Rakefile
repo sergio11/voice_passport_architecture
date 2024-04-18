@@ -205,6 +205,23 @@ namespace :voicepassport do
         end
     end
 
+    namespace :dapp do
+        desc "Install dependencies for VoiceIdVerifierDapp"
+        task :install_dependencies do
+          sh "cd VoiceIdVerifierDapp && npm install"
+        end
+      
+        desc "Run tests for VoiceIdVerifierDapp using Hardhat"
+        task :run_tests do
+          sh "cd VoiceIdVerifierDapp && npx hardhat test"
+        end
+      
+        desc "Deploy contracts for VoiceIdVerifierDapp on the amoy network"
+        task :deploy_contracts do
+          sh "cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts"
+        end
+    end
+    
     # Cleaning Environment task
     desc "Cleaning Environment task"
     task :clean_environment do 
