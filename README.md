@@ -79,6 +79,10 @@ Blockchain verification is pivotal in ensuring the security, integrity, and tran
 
 By leveraging the capabilities of the VoiceIDVerifier DApp and blockchain technology, the voice authentication system achieves heightened security, transparency, and trustworthiness, ensuring a robust and reliable mechanism for authenticating user identities.
 
+## UML Diagram Explanation for VoiceIDVerifier DApp Deployed on Polygon PoS
+
+<img width="auto" src="./doc/VoiceIdVerifierDapp.svg" />
+
 ## The Vector Database: A Core Element, Why QDrant? 📊
 
 The vector database plays a crucial role in the voice authentication system, and choosing QDrant as the platform for its implementation offers several significant advantages. Below are some key reasons why QDrant is the ideal choice for managing the vector database in our system:
