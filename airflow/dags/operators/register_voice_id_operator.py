@@ -16,6 +16,7 @@ class RegisterVoiceIDOperator(BaseOperator):
         caller_address,
         caller_private_key,
         contract_address,
+        contract_abi,
         *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
@@ -23,6 +24,7 @@ class RegisterVoiceIDOperator(BaseOperator):
         self.caller_address = caller_address
         self.caller_private_key = caller_private_key
         self.contract_address = contract_address
+        self.contract_abi = contract_abi
 
     def _sha256(data):
         hash_object = hashlib.sha256(data.encode())
@@ -66,13 +68,28 @@ class RegisterVoiceIDOperator(BaseOperator):
         Get address nonce.
         """
         return web3.eth.get_transaction_count(self.caller_address)
+    
+    def _load_contract_abi(self, context):
+        """
+        Loads the ABI (Application Binary Interface) of the smart contract from MinIO.
 
-    def _load_contract_abi(self):
+        Args:
+        - context (dict): The context containing MinIO connection details.
+
+        Returns:
+        - bytes: The binary data of the contract ABI file.
+
+        Raises:
+        - Exception: If there's an error during the ABI retrieval process.
         """
-        Load contract ABI from file.
-        """
-        with open(self.contract_abi) as f:
-            return json.load(f)
+        try:
+            minio_client = self._get_minio_client(context)
+            response = minio_client.get_object(self.minio_bucket_name, self.contract_abi)
+            file_data = response.read()
+            return file_data
+        except Exception as e:
+            error_message = f"Error retrieving file '{self.contract_abi}' from MinIO: {e}"
+            raise Exception(error_message)
 
     def _get_contract_instance(self, web3, contract_abi):
         """
@@ -117,8 +134,8 @@ class RegisterVoiceIDOperator(BaseOperator):
         # Get the transaction nonce for the caller address
         nonce = self._get_nonce(web3)
         
-        # Load the contract ABI from the specified file
-        contract_abi = self._load_contract_abi()
+        # Load the contract ABI from clearthe specified file
+        contract_abi = self._load_contract_abi(context)
         
         # Get an instance of the Smart Contract using the Web3 provider and contract ABI
         contract = self._get_contract_instance(web3, contract_abi)
