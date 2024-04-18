@@ -81,6 +81,8 @@ By leveraging the capabilities of the VoiceIDVerifier DApp and blockchain techno
 
 ## UML Diagram Explanation for VoiceIDVerifier DApp Deployed on Polygon PoS
 
+The UML diagram provides an overview of the VoiceIDVerifier decentralized application (DApp) deployed on the Polygon Proof of Stake (PoS) blockchain network. This diagram illustrates the key components, interactions, and workflows involved in the authentication process within the DApp.
+
 <img width="auto" src="./doc/VoiceIdVerifierDapp.svg" />
 
 ## The Vector Database: A Core Element, Why QDrant? 📊
@@ -98,8 +100,84 @@ The vector database plays a crucial role in the voice authentication system, and
 In summary, QDrant provides a comprehensive and highly efficient solution for managing the vector database in our voice authentication system. Its scalability, performance, security, and integration capabilities make it the ideal choice to meet the storage and search needs of voice vectors in a robust and secure voice authentication environment.
 
 ## Installation
-To install VoicePassport, simply clone the repository and follow the installation instructions in the [documentation](docs/installation.md).
 
+
+### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
+
+The first step is to clone the repository and execute the following command directory to install all the required modules
+
+```
+rake voicepassport:dapp:install_dependencies
+```
+
+After that it will be necessary to create an account in Alchemy, infura or another similar service in order to configure the network on which the Dapp will be deployed.
+
+In my case, I have created a project in Alchemy and I have created a `secret.json` file to configure the deployment over the Mumbai testnet as you can see in the `hardhat.config.ts` file of the project:
+
+```
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+const secret = require('./.secret.json');
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.9",
+    settings: {
+      optimizer: {
+        enabled: true,
+      },
+    },
+  },
+  networks: {
+    hardhat: {},
+    ganache: {
+      url: "http://127.0.0.1:7545",
+      allowUnlimitedContractSize: true,
+      gas: 2100000,
+      gasPrice: 8000000000
+    },
+    amoy: {
+      url: `https://polygon-amoy.g.alchemy.com/v2/${secret.projectId}`,
+      accounts: [secret.accountPrivateKey]
+    }
+  }
+};
+
+export default config;
+```
+
+The project has a set of tests to validate the correct behaviour of the contracts and the interaction between them.
+You can run the following command to launch the test suite on the local EVM:
+
+```
+rake voicepassport:dapp:run_tests
+```
+
+```
+VoiceIDVerifier
+    ✔ Should set the right owner (3173ms)
+    ✔ register voiceID verification successfully (181ms)
+    ✔ disable voiceID verification successfully (164ms)
+    ✔ enable voiceID verification successfully (170ms)
+    ✔ only the contract's owner can register and verify voice ids (112ms)
+
+
+  5 passing (4s)
+```
+
+
+You can deploy your own VoiceIdVerifier DApp instance using the following command:
+
+```
+rake voicepassport:dapp:deploy_contracts
+```
+
+The project has been deployed on the Polygon PoS Amoy testnet, the address of the contract is as follows:
+
+```
+cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
+VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
+```
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
