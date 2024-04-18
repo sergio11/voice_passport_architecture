@@ -4,3 +4,5 @@ gunicorn
 minio==7.2.0
 Resemblyzer==0.1.4
 qdrant-client==1.8.2
+web3==6.17.0
+pymongo==4.0.1
