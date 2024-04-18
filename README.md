@@ -43,23 +43,31 @@
 * **🐳 Docker**: Containerization platform for packaging VoicePassport application components.
 * **🔀 HAProxy**: Load balancer for distributing incoming traffic across multiple Docker containers.
 
-## How It Works
-1. **Enrollment**: Users enroll their voice profiles by providing audio samples, which are processed by Resemblyzer to generate unique voice embeddings.
-2. **Authentication**: During authentication, users speak a passphrase, and their voice is compared against the stored voice embeddings using vector similarity search.
-3. **Blockchain Verification**: User authentication data is cryptographically hashed and recorded on the blockchain for verification and auditability.
-4. **Apache Airflow Integration**: The entire authentication workflow is managed by Apache Airflow, ensuring efficient task execution and workflow orchestration.
+## Unveiling Architecture 🏛️
+
+1. **Enrollment** 🎤: Users enroll and register their voice profiles by providing audio samples. These audio samples are processed by Resemblyzer, an advanced voice analysis tool, to generate unique voice embeddings. These voice embeddings capture the distinctive characteristics of each user's voice accurately and securely. Once generated, these embeddings are stored in a database for later use in authentication.
+
+2. **Authentication** 🔐: During authentication, users speak a passphrase, and their voice is compared against the stored voice embeddings using a vector similarity search algorithm. This process determines the likelihood of a match between the user's voice and the previously registered voice embeddings. If the match is sufficiently high, the user is successfully authenticated.
+
+3. **Blockchain Verification** 🛡️: User authentication data, including voice embeddings and authentication results, undergoes cryptographic hashing and is recorded on the blockchain. This approach ensures the security and integrity of authentication data by providing an immutable and auditable record of all user interactions with the voice authentication system.
+
+4. **Apache Airflow Integration** ⚙️: The entire authentication workflow, from audio processing to task management and workflow orchestration, is handled by Apache Airflow. This integration ensures the efficient execution of audio processing tasks, voice embedding generation, and blockchain integration. Additionally, it enables centralized monitoring and management of the authentication process, ensuring its reliability and scalability.
+
+This architectural approach provides a comprehensive and robust solution for voice authentication, offering an optimal balance of security, efficiency, and user-friendliness for end-users.
 
 ## Installation
 To install VoicePassport, simply clone the repository and follow the installation instructions in the [documentation](docs/installation.md).
 
-## Usage
-For detailed usage instructions, refer to the [user manual](docs/user_manual.md).
-
-## Contributing
-Contributions are welcome! Please read the [contribution guidelines](CONTRIBUTING.md) before submitting any pull requests.
+## Contribution
+Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
 ## License
-VoicePassport is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
+
+## Credits
+VoicePassport Architecture is developed and maintained by **Sergio Sánchez Sánchez** (Dream Software). Special thanks to the open-source community and the contributors who have made this project possible.
+If you have any questions, feedback, or suggestions, feel free to reach out at dreamsoftware92@gmail.com.
+
 
 
 
