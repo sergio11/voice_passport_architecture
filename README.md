@@ -28,6 +28,21 @@
 
 * **👤 Intuitive User Experience:** Designed for user convenience, VoicePassport offers a hassle-free authentication experience. Users can effortlessly enroll their voice profiles and authenticate themselves with a simple voice command, eliminating the complexity of traditional password-based methods.
 
+## 🛠️ Technologies Used
+
+* **🎤 Resemblyzer**: Advanced voice analysis tool for generating voice embeddings.
+* **🔍 QDrant**: Vector database for efficient storage and querying of voice embeddings.
+* **🐍 Python**: Programming language used for backend development.
+* **🌐 Flask**: Web framework for building the RESTful API.
+* **🔗 Web3**: Python library for interacting with Ethereum blockchain.
+* **📝 Solidity**: Programming language for writing smart contracts on the Ethereum blockchain.
+* **🟣 Polygon PoS**: Scalable Ethereum sidechain for fast and low-cost transactions.
+* **📦 MinIO**: Object storage service for storing voice samples and embeddings.
+* **🍃 MongoDB**: NoSQL database for storing user metadata and authentication data.
+* **🌀 Apache Airflow**: Workflow management tool for automation of audio processing tasks and database integration.
+* **🐳 Docker**: Containerization platform for packaging VoicePassport application components.
+* **🔀 HAProxy**: Load balancer for distributing incoming traffic across multiple Docker containers.
+
 ## How It Works
 1. **Enrollment**: Users enroll their voice profiles by providing audio samples, which are processed by Resemblyzer to generate unique voice embeddings.
 2. **Authentication**: During authentication, users speak a passphrase, and their voice is compared against the stored voice embeddings using vector similarity search.
