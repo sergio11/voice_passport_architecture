@@ -125,7 +125,7 @@ namespace :voicepassport do
         begin
             File.open(abi_json_file_path, 'rb') do |file|
                 s3_client.put_object(
-                    key: 'VoiceIDVerifier.json',
+                    key: ENV["VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"],
                     body: file,
                     bucket: bucket_name,
                     content_type: 'application/json'
@@ -151,7 +151,7 @@ namespace :voicepassport do
         )
 
         bucket_name = ENV["MINIO_BUCKET_NAME"]
-        abi_json_file_name = 'VoiceIDVerifier.json'
+        abi_json_file_name = ENV["VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"]
 
         # Check if the bucket exists
         bucket_exists = s3_client.head_bucket(bucket: bucket_name) rescue false
@@ -185,7 +185,7 @@ namespace :voicepassport do
         )
 
         bucket_name = ENV["MINIO_BUCKET_NAME"]
-        abi_json_file_name = 'VoiceIDVerifier.json'
+        abi_json_file_name = ENV["VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"]
 
         # Check if the bucket exists
         bucket_exists = s3_client.head_bucket(bucket: bucket_name) rescue false
