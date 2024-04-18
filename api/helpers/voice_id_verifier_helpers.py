@@ -2,12 +2,14 @@ import os
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 import hashlib
+from minio_helpers import get_file_from_minio
 
 # VoiceId Verifier configuration
 VOICE_ID_VERIFIER_HTTP_PROVIDER = os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER")
 VOICE_ID_VERIFIER_CALLER_ADDRESS = os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS")
 VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY = os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY")
 VOICE_ID_VERIFIER_CONTRACT_ADDRESS = os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS")
+VOICE_ID_VERIFIER_CONTRACT_ABI_NAME = os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME")
 
 def verify_voice_id(user_id, voice_id):
     """
@@ -20,7 +22,7 @@ def verify_voice_id(user_id, voice_id):
     Returns:
     - bool: True if the voice ID matches the stored hash in the contract, False otherwise.
     """
-    contract_abi = ""
+    contract_abi = get_file_from_minio(VOICE_ID_VERIFIER_CONTRACT_ABI_NAME)
     web3 = _connect_to_web3()
     contract = web3.eth.contract(address=VOICE_ID_VERIFIER_CONTRACT_ADDRESS, abi=contract_abi)
     user_id_hash = _sha256(user_id)
@@ -50,7 +52,7 @@ def change_voice_id_verification_state(user_id, is_enabled):
     - Requires the global variables VOICE_ID_VERIFIER_CONTRACT_ADDRESS,
       VOICE_ID_VERIFIER_CALLER_ADDRESS, and VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY to be properly defined.
     """
-    contract_abi = ""  # Insert the contract ABI here
+    contract_abi = get_file_from_minio(VOICE_ID_VERIFIER_CONTRACT_ABI_NAME)
     web3 = _connect_to_web3()
     contract = web3.eth.contract(address=VOICE_ID_VERIFIER_CONTRACT_ADDRESS, abi=contract_abi)
 
