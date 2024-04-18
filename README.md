@@ -81,6 +81,8 @@ By leveraging the capabilities of the VoiceIDVerifier DApp and blockchain techno
 
 ## UML Diagram Explanation for VoiceIDVerifier DApp Deployed on Polygon PoS
 
+The UML diagram provides an overview of the VoiceIDVerifier decentralized application (DApp) deployed on the Polygon Proof of Stake (PoS) blockchain network. This diagram illustrates the key components, interactions, and workflows involved in the authentication process within the DApp.
+
 <img width="auto" src="./doc/VoiceIdVerifierDapp.svg" />
 
 ## The Vector Database: A Core Element, Why QDrant? 📊
