@@ -1,15 +1,14 @@
 import datetime
-import os
 from flask import Flask, request
 import logging
+from api.helpers.jwt_helpers import validate_jwt, generate_jwt
 from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
 from helpers.minio_helpers import handle_minio_storage
 from helpers.api_helpers import cleanup_temp_file, create_response, extract_voice_file_from_request, save_file_locally 
 from helpers.airflow_helpers import trigger_airflow_dag
 from helpers.qdrant_helpers import search_most_similar_audio
 from helpers.voice_id_verifier_helpers import verify_voice_id, change_voice_id_verification_state
-import jwt
-from datetime import datetime, timedelta, timezone
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,8 +16,6 @@ logger = logging.getLogger(__name__)
 
 # Base prefix for application routes
 BASE_URL_PREFIX = "/api/voice-passport"
-
-JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
 # Create a Flask application
 app = Flask(__name__)
@@ -106,22 +103,21 @@ def signin_user():
     # Return a formatted response based on the verification result
     if verification_result:
         # Generate JWT token with user ID as claim
-        token_expiry = datetime.now(timezone.utc) + timedelta(hours=1)  # Token expires in 1 hour
-        token_payload = {'user_id': str(user_info["_id"]), 'exp': token_expiry}
-        jwt_token = jwt.encode(token_payload, JWT_SECRET_KEY, algorithm='HS256')
+        jwt_token = generate_jwt(str(user_info["_id"]))
         response_data = {
             "user_id": str(user_info["_id"]),
             "fullname": user_info["fullname"],
             "email": user_info["email"],
-            "token": jwt_token.decode('utf-8')  # Decode bytes to string
+            "token": jwt_token
         }
-        return create_response("Success", 200, "User signed in successfully.", user_info=response_data)
+        return create_response("Success", 200, "User signed in successfully.", data=response_data)
     else:
         return create_response("Forbidden", 403, "Access denied.")
 
 
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/enable", methods=['PUT'])
-def enable_user(user_id):
+@validate_jwt
+def enable_user(decoded_token, user_id):
     """
     Enable a user identified by user_id.
 
@@ -133,28 +129,16 @@ def enable_user(user_id):
     Returns:
     - dict: A dictionary containing the result of the operation.
     """
-    # Get JWT token from the request headers
-    jwt_token = request.headers.get('Authorization')
-
-    # Verify JWT token
-    if jwt_token:
-        try:
-            decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
-            # Check if user ID in JWT matches the user ID provided in the URL
-            if decoded_token.get('user_id') == user_id:
-                change_voice_id_verification_state(user_id=user_id, is_enabled=True)
-                return {"success": True, "message": f"User with ID {user_id} enabled successfully."}, 200
-            else:
-                return {"success": False, "message": "Unauthorized access."}, 401
-        except jwt.ExpiredSignatureError:
-            return {"success": False, "message": "JWT token expired."}, 401
-        except jwt.InvalidTokenError:
-            return {"success": False, "message": "Invalid JWT token."}, 401
+    # Check if user ID in JWT matches the user ID provided in the URL
+    if decoded_token.get('user_id') == user_id:
+        change_voice_id_verification_state(user_id=user_id, is_enabled=True)
+        return create_response("Success", 200, f"User with ID {user_id} enabled successfully.")
     else:
-        return {"success": False, "message": "JWT token missing."}, 401
+        return create_response("Forbidden", 403, "Unauthorized access.")
 
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/disable", methods=['PUT'])
-def disable_user(user_id):
+@validate_jwt
+def disable_user(decoded_token, user_id):
     """
     Disable a user identified by user_id.
 
@@ -166,25 +150,37 @@ def disable_user(user_id):
     Returns:
     - dict: A dictionary containing the result of the operation.
     """
-    # Get JWT token from the request headers
-    jwt_token = request.headers.get('Authorization')
-
-    # Verify JWT token
-    if jwt_token:
-        try:
-            decoded_token = jwt.decode(jwt_token, JWT_SECRET_KEY, algorithms=['HS256'])
-            # Check if user ID in JWT matches the user ID provided in the URL
-            if decoded_token.get('user_id') == user_id:
-                change_voice_id_verification_state(user_id=user_id, is_enabled=False)
-                return {"success": True, "message": f"User with ID {user_id} disabled successfully."}, 200
-            else:
-                return {"success": False, "message": "Unauthorized access."}, 401
-        except jwt.ExpiredSignatureError:
-            return {"success": False, "message": "JWT token expired."}, 401
-        except jwt.InvalidTokenError:
-            return {"success": False, "message": "Invalid JWT token."}, 401
+    # Check if user ID in JWT matches the user ID provided in the URL
+    if decoded_token.get('user_id') == user_id:
+        change_voice_id_verification_state(user_id=user_id, is_enabled=False)
+        return create_response("Success", 200, f"User with ID {user_id} disabled successfully.")
     else:
-        return {"success": False, "message": "JWT token missing."}, 401
+        return create_response("Forbidden", 403, "Unauthorized access.")
+    
+
+@app.route(f"{BASE_URL_PREFIX}/accounts/current", methods=['GET'])
+@validate_jwt
+def get_current_user(decoded_token):
+    """
+    Get information about the currently authenticated user.
+
+    This endpoint retrieves information about the user whose JWT token is provided in the request headers.
+
+    Returns:
+    - dict: A dictionary containing information about the currently authenticated user.
+    """
+    # Extract user ID from decoded token
+    user_id = decoded_token.get('user_id')
+    if user_id:
+        user_info = find_user_details(user_id)
+        user_info = {
+            "user_id": user_id,
+            "fullname": user_info["fullname"],
+            "email": user_info["email"],
+        }
+        return create_response("Success", 200, "Information about the currently authenticated user retrieved successfully.", data=user_info)
+    else:
+        return create_response("Forbidden", 403, "Unauthorized access.")
 
 @app.errorhandler(Exception)
 def handle_error(e):
