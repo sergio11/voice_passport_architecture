@@ -12,10 +12,10 @@ default_args = {
 }
 
 # Create the DAG with the specified default arguments
-with DAG('voice_passport_dag', default_args=default_args, default_view="graph", schedule_interval=None, catchup=False) as dag:
+with DAG('voice_identity_registration_dag', default_args=default_args, default_view="graph", schedule_interval=None, catchup=False) as dag:
     # Import the necessary operators from external modules
-    operators_module = importlib.import_module('operators.voice_embedding_operator')
-    VoiceEmbeddingOperator = operators_module.VoiceEmbeddingOperator
+    operators_module = importlib.import_module('operators.generate_voice_embeddings_operator')
+    GenerateVoiceEmbeddingsOperator = operators_module.GenerateVoiceEmbeddingsOperator
     operators_module = importlib.import_module('operators.qdrant_embeddings_operator')
     QDrantEmbeddingsOperator = operators_module.QDrantEmbeddingsOperator
     operators_module = importlib.import_module('operators.register_voice_id_operator')
@@ -24,11 +24,8 @@ with DAG('voice_passport_dag', default_args=default_args, default_view="graph", 
     # Define the task instances for each operator
 
     # Define the task to extract voice embeddings from audio file
-    voice_embedding_task = VoiceEmbeddingOperator(
-        task_id='voice_embedding_task',
-        qdrant_uri=os.environ.get("MONGO_URI"),
-        qdrant_api_key=os.environ.get("MONGO_URI"),
-        qdrant_collection=os.environ.get("MONGO_URI"),
+    generate_voice_embedding_task = GenerateVoiceEmbeddingsOperator(
+        task_id='generate_voice_embedding_task',
         mongo_uri=os.environ.get("MONGO_URI"),
         mongo_db=os.environ.get("MONGO_DB"),
         mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
@@ -41,6 +38,9 @@ with DAG('voice_passport_dag', default_args=default_args, default_view="graph", 
     # Define the task to upsert the extracted voice embeddings into QDrant for similarity search
     qdrant_embeddings_task = QDrantEmbeddingsOperator(
         task_id='qdrant_embeddings_task',
+        qdrant_uri=os.environ.get("QDRANT_URI"),
+        qdrant_api_key=os.environ.get("QDRANT_API_KEY"),
+        qdrant_collection=os.environ.get("QDRANT_COLLECTION"),
         mongo_uri=os.environ.get("MONGO_URI"),
         mongo_db=os.environ.get("MONGO_DB"),
         mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
@@ -68,4 +68,4 @@ with DAG('voice_passport_dag', default_args=default_args, default_view="graph", 
     )
 
     # Define task dependencies by chaining the tasks in sequence
-    voice_embedding_task >> qdrant_embeddings_task >> register_voice_task
+    generate_voice_embedding_task >> qdrant_embeddings_task >> register_voice_task

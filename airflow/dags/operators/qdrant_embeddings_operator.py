@@ -45,13 +45,9 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
        # Get the configuration passed to the DAG from the execution context
        dag_run_conf = context['dag_run'].conf
        # Get the user_id and embeddings from the configuration
-       user_id = dag_run_conf['user_id']
+       voice_file_id = dag_run_conf['voice_file_id']
        embeddings = dag_run_conf['embeddings']
-       self._log_to_mongodb(f"Received user_id: {user_id}", context, "INFO")
-       # Retrieve user information based on the user ID from MongoDB
-       user_info = self._get_user_info(context, user_id)
-       # Extract the voice file ID from the user information
-       voice_file_id = self._get_voice_id_from_user_info(context, user_info)
+       self._log_to_mongodb(f"Received voice_file_id: {voice_file_id}", context, "INFO")
        try:
             # Initialize QDrant client
             client = self._initialize_qdrant_client()
@@ -71,4 +67,4 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
             raise e
        # Log the end of the execution
        self._log_to_mongodb(f"Execution of QDrantOperator completed", context, "INFO")
-       return {"user_id": str(user_id)}
+       return {"voice_file_id": str(voice_file_id)}
