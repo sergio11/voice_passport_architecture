@@ -3,10 +3,8 @@ from flask import Flask, request
 import logging
 from api.helpers.jwt_helpers import validate_jwt, generate_jwt
 from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
-from helpers.minio_helpers import handle_minio_storage
-from helpers.api_helpers import cleanup_temp_file, create_response, extract_voice_file_from_request, save_file_locally 
-from helpers.airflow_helpers import trigger_airflow_dag
-from helpers.qdrant_helpers import search_most_similar_audio
+from helpers.api_helpers import process_voice_file, create_response, validate_webhook_url
+from helpers.airflow_helpers import trigger_voice_registration_dag, trigger_voice_authentication_dag
 from helpers.voice_id_verifier_helpers import verify_voice_id, change_voice_id_verification_state
 
 
@@ -20,99 +18,73 @@ BASE_URL_PREFIX = "/api/voice-passport"
 # Create a Flask application
 app = Flask(__name__)
 
-app.route(f"{BASE_URL_PREFIX}/signup", methods=['POST'])
-def signup_user():
-    voice_file = extract_voice_file_from_request(request, logger)
-    # Save the file locally
-    temp_file_path = save_file_locally(voice_file)
-    # Store the file in MinIO
-    minio_object_name = handle_minio_storage(temp_file_path)
+@app.route(f"{BASE_URL_PREFIX}/schedule_user_registration", methods=['POST'])
+def schedule_user_registration():
     fullname = request.form.get('fullname')
     email = request.form.get('email')
-    if not all([fullname, email]):
+    result_webhook = request.form.get('result_webhook')
+
+    # Validate received data
+    if not all([fullname, email, result_webhook]):
         logger.error("Missing parameters")
-        return create_response("Error", 400, "Missing parameters: fullname or email")
+        return create_response("Error", 400, "Missing parameters: fullname, email, or result_webhook")
+
+    # Validate the format of the webhook URL
+    if not validate_webhook_url(result_webhook, logger):
+        return create_response("Error", 400, "Invalid webhook URL format")
+
+    # Process the voice file
+    voice_file_id = process_voice_file(request, logger)
 
     # Save metadata about the user in MongoDB
-    user_id = save_user_metadata(fullname, email, minio_object_name)
+    user_id = save_user_metadata(fullname, email, voice_file_id)
 
-    # Clean up the temporary file
-    cleanup_temp_file(temp_file_path)
+    # Schedule the user registration DAG
+    return _schedule_user_registration(user_id, voice_file_id, result_webhook)
 
+@app.route(f"{BASE_URL_PREFIX}/schedule_user_authentication", methods=['POST'])
+def schedule_user_authentication():
+    result_webhook = request.form.get('result_webhook')
+
+    # Validate the format of the webhook URL
+    if not validate_webhook_url(result_webhook, logger):
+        return create_response("Error", 400, "Invalid webhook URL format")
+    
+    # Process the voice file
+    voice_file_id = process_voice_file(request, logger)
+
+    # Schedule the user authentication DAG
+    return _schedule_user_authentication(voice_file_id, result_webhook)
+
+def _schedule_user_registration(user_id, voice_file_id, result_webhook):
     try:
         # Calculate the logical date 2 minutes from now
         logical_date = datetime.utcnow() + datetime.timedelta(minutes=2)
-        # Trigger the Airflow DAG execution
-        response = trigger_airflow_dag(logical_date)
+        # Trigger the registration DAG execution
+        response = trigger_voice_registration_dag(voice_file_id, logical_date, result_webhook)
         if response.status_code == 200:
-            # Update the MongoDB document with "planned" flag and date
-            update_user_register_planned_date(user_id, logical_date)
-            logger.info("DAG execution triggered successfully")
-            # Get user details
-            user_info = find_user_details(user_id)
-            response_data = create_response("Success", 200, "User generated and scheduled successfully.", data= {
-                "user_id": str(user_info["_id"]),
-                "fullname": user_info["title"],
-                "email": user_info["email"],
-                "planned_date": user_info["planned_date"]
-            })
-            return response_data
+            return create_response("Success", 200, "User registration scheduled successfully.", data={"user_id": user_id})
         else:
-            # If DAG execution fails, remove the document from MongoDB
-            delete_user_details(user_id)
-            logger.error(f"Error triggering DAG execution: {response.text}")
-            response_data = create_response("Error", response.status_code, "Error triggering DAG execution.")
-            return response_data
+            logger.error(f"Error triggering registration DAG execution: {response.text}")
+            return create_response("Error", response.status_code, "Error triggering user registration scheduling.")
     except Exception as e:
-        logger.error(f"An error occurred during file proccessing : {str(e)}")
-        delete_user_details(user_id)
-        return create_response("Error", 500, "An error occurred during file proccessing")
-    
+        logger.error(f"An error occurred during file processing: {str(e)}")
+        return create_response("Error", 500, "An error occurred during user registration scheduling.")
 
-@app.route(f"{BASE_URL_PREFIX}/signin", methods=['POST'])
-def signin_user():
-    """
-    Sign in a user by verifying their voice ID against stored voice ID hashes.
-
-    This endpoint receives a voice file from the request, searches for the most similar
-    voice ID in the system, retrieves the corresponding user, and verifies their voice ID.
-
-    Returns:
-    - dict: A dictionary containing the result of the verification process.
-            Example: {'success': True, 'message': 'User signed in successfully.',
-                      'user_info': {'user_id': '12345', 'fullname': 'John Doe', 'email': 'john@example.com'}}
-    """
-    # Extract voice file from the request
-    voice_file = extract_voice_file_from_request(request, logger)
-    
-    # Save the voice file locally
-    temp_file_path = save_file_locally(voice_file)
-    
-    # Search for the most similar audio in the system and retrieve the associated voice ID
-    voice_id = search_most_similar_audio(temp_file_path)
-
-    # Find the user associated with the retrieved voice ID
-    user_info = find_user_by_voice_id(voice_id)
-
-    # Verify the user's voice ID
-    verification_result = verify_voice_id(user_info["_id"], voice_id)
-
-    # Clean up the temporary voice file
-    cleanup_temp_file(temp_file_path)
-
-    # Return a formatted response based on the verification result
-    if verification_result:
-        # Generate JWT token with user ID as claim
-        jwt_token = generate_jwt(str(user_info["_id"]))
-        response_data = {
-            "user_id": str(user_info["_id"]),
-            "fullname": user_info["fullname"],
-            "email": user_info["email"],
-            "token": jwt_token
-        }
-        return create_response("Success", 200, "User signed in successfully.", data=response_data)
-    else:
-        return create_response("Forbidden", 403, "Access denied.")
+def _schedule_user_authentication(voice_file_id, result_webhook):
+    try:
+        # Calculate the logical date 2 minutes from now
+        logical_date = datetime.utcnow() + datetime.timedelta(minutes=2)
+        # Trigger the authentication DAG execution
+        response = trigger_voice_authentication_dag(voice_file_id, logical_date, result_webhook)
+        if response.status_code == 200:
+            return create_response("Success", 200, "User authentication scheduled successfully.")
+        else:
+            logger.error(f"Error triggering authentication DAG execution: {response.text}")
+            return create_response("Error", response.status_code, "Error triggering user authentication scheduling.")
+    except Exception as e:
+        logger.error(f"An error occurred during file processing: {str(e)}")
+        return create_response("Error", 500, "An error occurred during user authentication scheduling.")
 
 
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/enable", methods=['PUT'])
