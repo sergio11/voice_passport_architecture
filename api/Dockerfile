@@ -15,7 +15,7 @@ COPY helpers/ helpers/
 RUN apt-get update && apt-get install -y gcc
 
 # Install dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port where the API will run
 EXPOSE 5000

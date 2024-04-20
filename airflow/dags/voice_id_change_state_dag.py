@@ -16,6 +16,8 @@ with DAG('voice_id_change_state_dag', default_args=default_args, default_view="g
     # Import the necessary operators from external modules
     operators_module = importlib.import_module('operators.change_voice_id_verification_state_operator')
     ChangeVoiceIdVerificationStateOperator = operators_module.ChangeVoiceIdVerificationStateOperator
+    operators_module = importlib.import_module('operators.process_result_webhook_operator')
+    ProcessResultWebhookOperator = operators_module.ProcessResultWebhookOperator
 
     # Define the task instances for each operator
 
@@ -34,3 +36,17 @@ with DAG('voice_id_change_state_dag', default_args=default_args, default_view="g
         minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
         minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
     )
+
+    process_result_webhook_task = ProcessResultWebhookOperator(
+        task_id='process_result_webhook_task',
+        mongo_uri=os.environ.get("MONGO_URI"),
+        mongo_db=os.environ.get("MONGO_DB"),
+        mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
+        minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
+        minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
+        minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+    )
+
+    # Define task dependencies by chaining the tasks in sequence
+    change_voice_id_verification_state_task >> process_result_webhook_task

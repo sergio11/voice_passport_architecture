@@ -20,6 +20,8 @@ with DAG('voice_identity_registration_dag', default_args=default_args, default_v
     QDrantEmbeddingsOperator = operators_module.QDrantEmbeddingsOperator
     operators_module = importlib.import_module('operators.register_voice_id_operator')
     RegisterVoiceIDOperator = operators_module.RegisterVoiceIDOperator
+    operators_module = importlib.import_module('operators.process_result_webhook_operator')
+    ProcessResultWebhookOperator = operators_module.ProcessResultWebhookOperator
 
     # Define the task instances for each operator
 
@@ -51,8 +53,8 @@ with DAG('voice_identity_registration_dag', default_args=default_args, default_v
     )
 
     # Define a task to register a VoiceID using a Smart Contract.
-    register_voice_task = RegisterVoiceIDOperator(
-        task_id='register_voice_task',
+    register_voice_id_task = RegisterVoiceIDOperator(
+        task_id='register_voice_id_task',
         http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER"),
         caller_address=os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS"),
         caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
@@ -67,5 +69,16 @@ with DAG('voice_identity_registration_dag', default_args=default_args, default_v
         minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
     )
 
+    process_result_webhook_task = ProcessResultWebhookOperator(
+        task_id='process_result_webhook_task',
+        mongo_uri=os.environ.get("MONGO_URI"),
+        mongo_db=os.environ.get("MONGO_DB"),
+        mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
+        minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
+        minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
+        minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+    )
+
     # Define task dependencies by chaining the tasks in sequence
-    generate_voice_embedding_task >> qdrant_embeddings_task >> register_voice_task
+    generate_voice_embedding_task >> qdrant_embeddings_task >> register_voice_id_task >> process_result_webhook_task

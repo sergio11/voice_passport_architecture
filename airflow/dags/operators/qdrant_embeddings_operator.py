@@ -57,7 +57,7 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
 
             # Upsert embeddings into the collection
             self._upsert_embeddings(client, voice_file_id, embeddings)
-
+            del context['dag_run'].conf['embeddings']
             # Log success
             self._log_to_mongodb(f"Embeddings successfully upserted into QDrant", context, "INFO")
        except Exception as e:
