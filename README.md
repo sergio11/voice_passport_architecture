@@ -183,6 +183,31 @@ The project has been deployed on the Polygon PoS Amoy testnet, the address of th
 cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
 VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
 ```
+
+## Task Descriptions
+
+The following table provides descriptions and examples of tasks available in the Rakefile for deploying and managing your environment.
+
+| Task                                            | Description                                                                                   | Command                                        |
+|-------------------------------------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------|
+| **voicepassport:deploy**                        | Deploys the architecture and launches all necessary services and daemons.                     | `rake voicepassport:deploy`                    |
+| **voicepassport:undeploy**                      | Undeploys the architecture.                                                                   | `rake voicepassport:undeploy`                  |
+| **voicepassport:start**                         | Starts the containers.                                                                        | `rake voicepassport:start`                     |
+| **voicepassport:stop**                          | Stops the containers.                                                                         | `rake voicepassport:stop`                      |
+| **voicepassport:status**                        | Shows the status of the containers.                                                           | `rake voicepassport:status`                    |
+| **voicepassport:create_apache_airflow_users**   | Creates users in Apache Airflow.                                                              | `rake voicepassport:create_apache_airflow_users`|
+| **voicepassport:build_and_push_airflow_image**  | Builds and pushes Apache Airflow Docker image to DockerHub.                                    | `rake voicepassport:build_and_push_airflow_image`|
+| **voicepassport:build_and_push_voice_passport_api_image** | Builds and pushes VoicePassport API Docker image to DockerHub.                             | `rake voicepassport:build_and_push_voice_passport_api_image` |
+| **voicepassport:upload_contract_abi_to_minio**  | Uploads the contract ABI JSON file to MinIO.                                                  | `rake voicepassport:upload_contract_abi_to_minio`|
+| **voicepassport:delete_contract_abi_from_minio**| Deletes the contract ABI JSON file from MinIO.                                                 | `rake voicepassport:delete_contract_abi_from_minio` |
+| **voicepassport:check_contract_abi_in_minio**  | Checks if the contract ABI JSON file exists in MinIO.                                          | `rake voicepassport:check_contract_abi_in_minio`|
+| **voicepassport:clean_environment**             | Cleans the environment.                                                                       | `rake voicepassport:clean_environment`         |
+| **voicepassport:check_docker**                  | Checks if Docker and Docker Compose are installed and accessible.                               | `rake voicepassport:check_docker`              |
+| **voicepassport:login**                         | Logs in to DockerHub.                                                                         | `rake voicepassport:login`                     |
+| **voicepassport:check_deployment_file**         | Checks the existence of the deployment file.                                                   | `rake voicepassport:check_deployment_file`     |
+
+To execute any of these tasks, use the `rake` command followed by the task name. For example, to deploy VoicePassport, run `rake voicepassport:deploy`.
+
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
