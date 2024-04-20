@@ -24,21 +24,24 @@ COPY ./packages/requirements.txt packages/requirements.txt
 COPY ./script/entrypoint.sh entrypoint.sh
 COPY ./config/airflow.cfg airflow.cfg
 
-# Install additional Python dependencies
-RUN pip install -r ./packages/requirements.txt
-
 # Install dos2unix to remove carriage return characters
 # Install ncat (an alternative to netcat), curl, libsndfile1
 RUN apt-get update && apt-get install -y ncat curl dos2unix libsndfile1
 
-# Run dos2unix on script files to remove carriage return characters
-RUN dos2unix entrypoint.sh
+RUN pip install --upgrade pip
+# Install additional Python dependencies
+RUN pip install --no-cache-dir -r ./packages/requirements.txt
 
 # Install all local packages
-RUN for package in /packages/local/*; do \
-        pip install -e $package; \
-    done
+RUN if [ -d "/packages/local" ]; then \
+        # Instalar todos los paquetes locales
+        for package in /packages/local/*; do \
+            pip install -e $package; \
+        done; \
+    fi
 
+# Run dos2unix on script files to remove carriage return characters
+RUN dos2unix entrypoint.sh
 # Change permissions
 RUN chmod +x entrypoint.sh
 RUN chown -R airflow: ${AIRFLOW_USER_HOME}
