@@ -2,5 +2,4 @@ flask==3.0.0
 requests==2.31.0
 gunicorn
 minio==7.2.0
-web3==6.17.0
 pymongo==4.0.1
