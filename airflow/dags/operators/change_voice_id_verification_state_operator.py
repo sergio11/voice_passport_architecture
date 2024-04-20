@@ -1,160 +1,50 @@
-import json
-from airflow.models import BaseOperator
+from operators.base_web3_custom_operator import BaseWeb3CustomOperator
 from airflow.utils.decorators import apply_defaults
-from web3.middleware import geth_poa_middleware
-from web3 import Web3
-import hashlib
 
-class ChangeVoiceIdVerificationStateOperator(BaseOperator):
+class ChangeVoiceIdVerificationStateOperator(BaseWeb3CustomOperator):
     """
-    Operator for changing the verification state of a user's voice ID 
-    in a smart contract on the Ethereum blockchain.
+    Operator for changing the verification state of a voice ID in a blockchain smart contract.
 
-    :param http_provider: HTTP provider URL for the Ethereum node.
-    :type http_provider: str
-    :param caller_address: Ethereum address of the caller.
-    :type caller_address: str
-    :param caller_private_key: Private key of the caller for signing transactions.
-    :type caller_private_key: str
-    :param contract_address: Ethereum address of the smart contract.
-    :type contract_address: str
-    :param contract_abi: Name of the file containing the contract ABI stored in MinIO.
-    :type contract_abi: str
+    Inherits from BaseWeb3CustomOperator.
+
+    Args:
+    - *args: Variable length argument list.
+    - **kwargs: Arbitrary keyword arguments.
+
+    Raises:
+    - ValueError: If 'user_id' parameter is empty or None, or if 'is_enabled' parameter is not a boolean.
+    - Exception: If there's an error during the ABI retrieval process, transaction building, or transaction execution.
+
+    Returns:
+    - dict: Information about the executed operation, including user ID and result.
     """
-
     @apply_defaults
     def __init__(
         self,
-        http_provider,
-        caller_address,
-        caller_private_key,
-        contract_address,
-        contract_abi,
         *args, **kwargs
     ):
+        """
+        Initializes the ChangeVoiceIdVerificationStateOperator.
+
+        Args:
+        - *args: Variable length argument list.
+        - **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(*args, **kwargs)
-        self.http_provider = http_provider
-        self.caller_address = caller_address
-        self.caller_private_key = caller_private_key
-        self.contract_address = contract_address
-        self.contract_abi = contract_abi
-
-    def _sha256(self, data):
-        """
-        Calculate the SHA256 hash of the input data.
-
-        :param data: Input data to be hashed.
-        :type data: str
-        :return: Hexadecimal representation of the SHA256 hash.
-        :rtype: str
-        """
-        hash_object = hashlib.sha256(data.encode())
-        return hash_object.hexdigest()
-
-    def _connect_to_web3(self):
-        """
-        Connect to the Web3 provider.
-
-        :return: Web3 instance connected to the specified provider.
-        :rtype: Web3
-        """
-        web3 = Web3(Web3.HTTPProvider(self.http_provider))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)  # Inject the middleware
-        return web3
-
-    def _check_connection(self, web3, context):
-        """
-        Check if connection to the Web3 provider is successful.
-
-        :param web3: Web3 instance connected to the provider.
-        :type web3: Web3
-        :param context: Context dictionary containing additional information.
-        :type context: dict
-        :raises Exception: If connection to the Web3 provider fails.
-        """
-        if web3.is_connected():
-            self._log_to_mongodb("Connection Successful", context, "INFO")
-        else:
-            self._log_to_mongodb("Connection Failed", context, "ERROR")
-            raise Exception("Failed to connect to Web3 provider")
-    
-    def _load_contract_abi(self, context):
-        """
-        Loads the ABI (Application Binary Interface) of the smart contract from MinIO.
-
-        :param context: Context containing MinIO connection details.
-        :type context: dict
-        :return: Contract ABI loaded from MinIO.
-        :rtype: dict
-        :raises Exception: If there's an error during the ABI retrieval process.
-        """
-        try:
-            minio_client = self._get_minio_client(context)
-            response = minio_client.get_object(self.minio_bucket_name, self.contract_abi)
-            contract_abi_json = response.read()
-            contract_abi = json.loads(contract_abi_json)
-            return contract_abi
-        except Exception as e:
-            error_message = f"Error retrieving file '{self.contract_abi}' from MinIO: {e}"
-            raise Exception(error_message)
-
-    def _get_contract_instance(self, web3, contract_abi):
-        """
-        Get an instance of the smart contract.
-
-        :param web3: Web3 instance connected to the provider.
-        :type web3: Web3
-        :param contract_abi: ABI of the smart contract.
-        :type contract_abi: dict
-        :return: Instance of the smart contract.
-        :rtype: Contract
-        """
-        return web3.eth.contract(address=self.contract_address, abi=contract_abi)
-    
-    def _get_chain_id(self, web3):
-        """
-        Get the chain ID of the Ethereum network.
-
-        :param web3: Web3 instance connected to the provider.
-        :type web3: Web3
-        :return: Chain ID of the Ethereum network.
-        :rtype: int
-        """
-        return web3.eth.chain_id
-
-    def _get_nonce(self, web3):
-        """
-        Get the nonce (transaction count) for the caller's address.
-
-        :param web3: Web3 instance connected to the provider.
-        :type web3: Web3
-        :return: Nonce for the caller's address.
-        :rtype: int
-        """
-        return web3.eth.get_transaction_count(self.caller_address)
-    
-    def _log_transaction_details(self, tx_receipt, context):
-        """
-        Log details of the transaction.
-
-        :param tx_receipt: Receipt of the transaction.
-        :type tx_receipt: dict
-        :param context: Context dictionary containing additional information.
-        :type context: dict
-        """
-        self._log_to_mongodb(f"Transaction hash: {tx_receipt.transactionHash}", context, "INFO")
-        self._log_to_mongodb(f"Gas used: {tx_receipt.gasUsed}", context, "INFO")
-        status = 'Success' if tx_receipt.status == 1 else 'Failed'
-        self._log_to_mongodb(f"Status: {status}", context, "INFO")
 
     def execute(self, context):
         """
-        Execute the operator.
+        Executes the operator to change the verification state of a voice ID in the blockchain smart contract.
 
-        :param context: Context dictionary containing additional information.
-        :type context: dict
-        :return: Dictionary containing information about the executed operation.
-        :rtype: dict
+        Args:
+        - context (dict): The context containing information about the DAG run.
+
+        Returns:
+        - dict: Information about the executed operation, including user ID and result.
+
+        Raises:
+        - ValueError: If 'user_id' parameter is empty or None, or if 'is_enabled' parameter is not a boolean.
+        - Exception: If there's an error during the ABI retrieval process, transaction building, or transaction execution.
         """
         # Log the start of the execution
         self._log_to_mongodb(f"Starting execution of ChangeVoiceIdVerificationState", context, "INFO")
