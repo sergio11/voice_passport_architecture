@@ -1,3 +1,4 @@
+import json
 import os
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
@@ -22,8 +23,9 @@ def verify_voice_id(user_id, voice_id):
     Returns:
     - bool: True if the voice ID matches the stored hash in the contract, False otherwise.
     """
-    contract_abi = get_file_from_minio(VOICE_ID_VERIFIER_CONTRACT_ABI_NAME)
     web3 = _connect_to_web3()
+    contract_abi_json = get_file_from_minio(VOICE_ID_VERIFIER_CONTRACT_ABI_NAME)
+    contract_abi = json.loads(contract_abi_json)
     contract = web3.eth.contract(address=VOICE_ID_VERIFIER_CONTRACT_ADDRESS, abi=contract_abi)
     user_id_hash = _sha256(user_id)
     voice_file_id_hash = _sha256(voice_id)

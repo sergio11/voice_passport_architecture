@@ -85,8 +85,9 @@ class RegisterVoiceIDOperator(BaseOperator):
         try:
             minio_client = self._get_minio_client(context)
             response = minio_client.get_object(self.minio_bucket_name, self.contract_abi)
-            file_data = response.read()
-            return file_data
+            contract_abi_json = response.read()
+            contract_abi = json.loads(contract_abi_json)
+            return contract_abi
         except Exception as e:
             error_message = f"Error retrieving file '{self.contract_abi}' from MinIO: {e}"
             raise Exception(error_message)
