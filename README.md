@@ -39,11 +39,6 @@
 
 * **👤 Intuitive User Experience:** Designed for user convenience, VoicePassport offers a hassle-free authentication experience. Users can effortlessly enroll their voice profiles and authenticate themselves with a simple voice command, eliminating the complexity of traditional password-based methods.
 
-<p align="center">
-  <img width="auto" height="250px" src="./doc/qdrant_logo.png" />
-  <img width="auto" height="250px" src="./doc/polygon_logo.png" />
-</p>
-
 ## 🛠️ Technologies Used
 
 * **🎤 Resemblyzer**: Advanced voice analysis tool for generating voice embeddings.
@@ -85,6 +80,8 @@ Blockchain verification is pivotal in ensuring the security, integrity, and tran
 
 By leveraging the capabilities of the VoiceIDVerifier DApp and blockchain technology, the voice authentication system achieves heightened security, transparency, and trustworthiness, ensuring a robust and reliable mechanism for authenticating user identities.
 
+<img width="auto" height="250px" src="./doc/polygon_logo.png" />
+
 ## UML Diagram Explanation for VoiceIDVerifier DApp Deployed on Polygon PoS
 
 The UML diagram provides an overview of the VoiceIDVerifier decentralized application (DApp) deployed on the Polygon Proof of Stake (PoS) blockchain network. This diagram illustrates the key components, interactions, and workflows involved in the authentication process within the DApp.
@@ -104,6 +101,8 @@ The vector database plays a crucial role in the voice authentication system, and
 4. **Integration with Voice Technologies**: QDrant seamlessly integrates with other key voice technologies, such as Resemblyzer, making it easy to generate, store, and search voice vectors in the voice authentication system. This seamless integration ensures optimal interoperability between the various tools and components of the system.
 
 In summary, QDrant provides a comprehensive and highly efficient solution for managing the vector database in our voice authentication system. Its scalability, performance, security, and integration capabilities make it the ideal choice to meet the storage and search needs of voice vectors in a robust and secure voice authentication environment.
+
+ <img width="auto" height="350px" src="./doc/qdrant_logo.png" />
 
 ## Installation
 
