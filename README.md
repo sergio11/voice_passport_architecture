@@ -26,6 +26,7 @@
   <img src="https://img.shields.io/badge/Blockchain.com-121D33?logo=blockchaindotcom&logoColor=fff&style=for-the-badge" />
 </p>
 
+
 ## ✨ Features
 
 * **🔒 Advanced Voice Authentication**: VoicePassport harnesses the cutting-edge Resemblyzer technology to analyze and generate unique voice embeddings from user audio samples. These embeddings serve as the foundation for precise and trustworthy user authentication based on voice similarity.
@@ -79,6 +80,8 @@ Blockchain verification is pivotal in ensuring the security, integrity, and tran
 
 By leveraging the capabilities of the VoiceIDVerifier DApp and blockchain technology, the voice authentication system achieves heightened security, transparency, and trustworthiness, ensuring a robust and reliable mechanism for authenticating user identities.
 
+<img width="auto" height="250px" src="./doc/polygon_logo.png" />
+
 ## UML Diagram Explanation for VoiceIDVerifier DApp Deployed on Polygon PoS
 
 The UML diagram provides an overview of the VoiceIDVerifier decentralized application (DApp) deployed on the Polygon Proof of Stake (PoS) blockchain network. This diagram illustrates the key components, interactions, and workflows involved in the authentication process within the DApp.
@@ -98,6 +101,8 @@ The vector database plays a crucial role in the voice authentication system, and
 4. **Integration with Voice Technologies**: QDrant seamlessly integrates with other key voice technologies, such as Resemblyzer, making it easy to generate, store, and search voice vectors in the voice authentication system. This seamless integration ensures optimal interoperability between the various tools and components of the system.
 
 In summary, QDrant provides a comprehensive and highly efficient solution for managing the vector database in our voice authentication system. Its scalability, performance, security, and integration capabilities make it the ideal choice to meet the storage and search needs of voice vectors in a robust and secure voice authentication environment.
+
+ <img width="auto" height="350px" src="./doc/qdrant_logo.png" />
 
 ## Installation
 
@@ -178,6 +183,31 @@ The project has been deployed on the Polygon PoS Amoy testnet, the address of th
 cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
 VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
 ```
+
+## Task Descriptions
+
+The following table provides descriptions and examples of tasks available in the Rakefile for deploying and managing your environment.
+
+| Task                                            | Description                                                                                   | Command                                        |
+|-------------------------------------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------|
+| **voicepassport:deploy**                        | Deploys the architecture and launches all necessary services and daemons.                     | `rake voicepassport:deploy`                    |
+| **voicepassport:undeploy**                      | Undeploys the architecture.                                                                   | `rake voicepassport:undeploy`                  |
+| **voicepassport:start**                         | Starts the containers.                                                                        | `rake voicepassport:start`                     |
+| **voicepassport:stop**                          | Stops the containers.                                                                         | `rake voicepassport:stop`                      |
+| **voicepassport:status**                        | Shows the status of the containers.                                                           | `rake voicepassport:status`                    |
+| **voicepassport:create_apache_airflow_users**   | Creates users in Apache Airflow.                                                              | `rake voicepassport:create_apache_airflow_users`|
+| **voicepassport:build_and_push_airflow_image**  | Builds and pushes Apache Airflow Docker image to DockerHub.                                    | `rake voicepassport:build_and_push_airflow_image`|
+| **voicepassport:build_and_push_voice_passport_api_image** | Builds and pushes VoicePassport API Docker image to DockerHub.                             | `rake voicepassport:build_and_push_voice_passport_api_image` |
+| **voicepassport:upload_contract_abi_to_minio**  | Uploads the contract ABI JSON file to MinIO.                                                  | `rake voicepassport:upload_contract_abi_to_minio`|
+| **voicepassport:delete_contract_abi_from_minio**| Deletes the contract ABI JSON file from MinIO.                                                 | `rake voicepassport:delete_contract_abi_from_minio` |
+| **voicepassport:check_contract_abi_in_minio**  | Checks if the contract ABI JSON file exists in MinIO.                                          | `rake voicepassport:check_contract_abi_in_minio`|
+| **voicepassport:clean_environment**             | Cleans the environment.                                                                       | `rake voicepassport:clean_environment`         |
+| **voicepassport:check_docker**                  | Checks if Docker and Docker Compose are installed and accessible.                               | `rake voicepassport:check_docker`              |
+| **voicepassport:login**                         | Logs in to DockerHub.                                                                         | `rake voicepassport:login`                     |
+| **voicepassport:check_deployment_file**         | Checks the existence of the deployment file.                                                   | `rake voicepassport:check_deployment_file`     |
+
+To execute any of these tasks, use the `rake` command followed by the task name. For example, to deploy VoicePassport, run `rake voicepassport:deploy`.
+
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
