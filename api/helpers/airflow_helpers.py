@@ -6,37 +6,20 @@ import requests
 # Get Airflow DAG IDs and API URL from environment variables
 AIRFLOW_REGISTRATION_DAG_ID = os.environ.get("AIRFLOW_REGISTRATION_DAG_ID")
 AIRFLOW_AUTHENTICATION_DAG_ID = os.environ.get("AIRFLOW_AUTHENTICATION_DAG_ID")
+AIRFLOW_CHANGE_STATE_DAG_ID = os.environ.get("AIRFLOW_CHANGE_STATE_DAG_ID")
 AIRFLOW_API_URL = os.environ.get("AIRFLOW_API_URL")
 
 # Get API Executor username and password from environment variables
 API_EXECUTOR_USERNAME = os.environ.get("API_EXECUTOR_USERNAME")
 API_EXECUTOR_PASSWORD = os.environ.get("API_EXECUTOR_PASSWORD")
 
-def _trigger_airflow_dag(dag_id, voice_file_id, logical_date, result_webhook):
-    """
-    Triggers the execution of an Airflow DAG.
-
-    Args:
-    - dag_id (str): The ID of the Airflow DAG to be executed.
-    - voice_file_id (str): The ID of the voice file associated with the DAG execution.
-    - logical_date (datetime): The logical date for the DAG execution.
-    - result_webhook (str): The webhook URL to notify the result of the DAG execution.
-
-    Returns:
-    - requests.Response: The response object from the API request.
-
-    Raises:
-    - Exception: If there's an error during the API request or response handling.
-    """
+def _trigger_airflow_dag(dag_id, logical_date, data):
     # Generate a unique DAG run ID
     dag_run_id = str(uuid.uuid4())
     logical_date_str = logical_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     dag_run_conf = {
-        "conf": {
-            "voice_file_id": str(voice_file_id),
-            "result_webhook": result_webhook
-        },
+        "conf": data,
         "dag_run_id": dag_run_id,  
         "logical_date": logical_date_str,
         "note": f"DAG run ID: {dag_run_id}"
@@ -64,8 +47,21 @@ def _trigger_airflow_dag(dag_id, voice_file_id, logical_date, result_webhook):
     return response
 
 # Use the trigger_airflow_dag function to trigger the desired DAG
-def trigger_voice_registration_dag(voice_file_id, logical_date, result_webhook):
-    return _trigger_airflow_dag(AIRFLOW_REGISTRATION_DAG_ID, voice_file_id, logical_date, result_webhook)
+def trigger_voice_registration_dag(logical_date, voice_file_id, result_webhook):
+    return _trigger_airflow_dag(AIRFLOW_REGISTRATION_DAG_ID, logical_date, data={
+        "voice_file_id": voice_file_id,
+        "result_webhook": result_webhook
+    })
 
-def trigger_voice_authentication_dag(voice_file_id, logical_date, result_webhook):
-    return _trigger_airflow_dag(AIRFLOW_AUTHENTICATION_DAG_ID, voice_file_id, logical_date, result_webhook)
+def trigger_voice_authentication_dag(logical_date, voice_file_id, result_webhook):
+    return _trigger_airflow_dag(AIRFLOW_AUTHENTICATION_DAG_ID, logical_date, data={
+        "voice_file_id": voice_file_id,
+        "result_webhook": result_webhook
+    })
+
+def trigger_voice_id_change_state_dag(logical_date, user_id, enable, result_webhook):
+    return _trigger_airflow_dag(AIRFLOW_CHANGE_STATE_DAG_ID, logical_date, data={
+        "user_id": user_id,
+        "result_webhook": result_webhook,
+        "is_enabled": enable
+    })
