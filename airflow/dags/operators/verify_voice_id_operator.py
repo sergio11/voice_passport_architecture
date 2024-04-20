@@ -1,115 +1,15 @@
-import json
-from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from web3.middleware import geth_poa_middleware
-from web3 import Web3
-import hashlib
+from operators.base_web3_custom_operator import BaseWeb3CustomOperator
 
-class VerifyVoiceIdOperator(BaseOperator):
-    """
-    Operator to verify the voice ID of a user by interacting with a smart contract on the blockchain.
-
-    This operator connects to a Web3 provider, loads the contract ABI from MinIO,
-    and then interacts with the smart contract to verify the association between
-    the user ID and the voice ID.
-
-    Args:
-    - http_provider (str): The HTTP provider URL for the Web3 connection.
-    - caller_address (str): The address of the caller account for interacting with the smart contract.
-    - caller_private_key (str): The private key of the caller account for signing transactions.
-    - contract_address (str): The address of the smart contract on the blockchain.
-    - contract_abi (str): The name of the ABI file containing the smart contract's interface.
-
-    Attributes:
-    - http_provider (str): The HTTP provider URL for the Web3 connection.
-    - caller_address (str): The address of the caller account for interacting with the smart contract.
-    - caller_private_key (str): The private key of the caller account for signing transactions.
-    - contract_address (str): The address of the smart contract on the blockchain.
-    - contract_abi (str): The name of the ABI file containing the smart contract's interface.
-
-    Methods:
-    - _sha256(data): Generates the SHA256 hash of the input data.
-    - _connect_to_web3(): Connects to the Web3 provider using the specified HTTP provider URL.
-    - _check_connection(web3, context): Checks if the connection to the Web3 provider is successful.
-    - _load_contract_abi(context): Loads the ABI of the smart contract from MinIO.
-    - _get_contract_instance(web3, contract_abi): Returns an instance of the smart contract.
-    - execute(context): Executes the operator logic to verify the voice ID of the user.
-
-    Raises:
-    - Exception: If there's an error during the ABI retrieval process or connecting to the Web3 provider.
-
-    Returns:
-    - dict: A dictionary containing information about the executed operation, including the user ID
-      and the verification result.
-    """
-
+class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
+  
     @apply_defaults
     def __init__(
         self,
-        http_provider,
-        caller_address,
-        caller_private_key,
-        contract_address,
-        contract_abi,
         *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
-        self.http_provider = http_provider
-        self.caller_address = caller_address
-        self.caller_private_key = caller_private_key
-        self.contract_address = contract_address
-        self.contract_abi = contract_abi
 
-    def _sha256(self, data):
-        hash_object = hashlib.sha256(data.encode())
-        return hash_object.hexdigest()
-
-    def _connect_to_web3(self):
-        """
-        Connect to Web3 provider.
-        """
-        web3 = Web3(Web3.HTTPProvider(self.http_provider))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)  # Inject the middleware
-        return web3
-
-    def _check_connection(self, web3, context):
-        """
-        Check if connection to Web3 provider is successful.
-        """
-        if web3.is_connected():
-            self._log_to_mongodb("Connection Successful", context, "INFO")
-        else:
-            self._log_to_mongodb("Connection Failed", context, "ERROR")
-            raise Exception("Failed to connect to Web3 provider")
-    
-    def _load_contract_abi(self, context):
-        """
-        Loads the ABI (Application Binary Interface) of the smart contract from MinIO.
-
-        Args:
-        - context (dict): The context containing MinIO connection details.
-
-        Returns:
-        - bytes: The binary data of the contract ABI file.
-
-        Raises:
-        - Exception: If there's an error during the ABI retrieval process.
-        """
-        try:
-            minio_client = self._get_minio_client(context)
-            response = minio_client.get_object(self.minio_bucket_name, self.contract_abi)
-            contract_abi_json = response.read()
-            contract_abi = json.loads(contract_abi_json)
-            return contract_abi
-        except Exception as e:
-            error_message = f"Error retrieving file '{self.contract_abi}' from MinIO: {e}"
-            raise Exception(error_message)
-
-    def _get_contract_instance(self, web3, contract_abi):
-        """
-        Get contract instance.
-        """
-        return web3.eth.contract(address=self.contract_address, abi=contract_abi)
 
     def execute(self, context):
         """
