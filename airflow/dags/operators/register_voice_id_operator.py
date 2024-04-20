@@ -141,21 +141,15 @@ class RegisterVoiceIDOperator(BaseOperator):
         # Get an instance of the Smart Contract using the Web3 provider and contract ABI
         contract = self._get_contract_instance(web3, contract_abi)
         
-        # Get the user ID from the DAG run configuration
-        user_id = context['dag_run'].conf['user_id']
-        
-        # Generate the SHA256 hash of the user ID
-        user_id_hash = self._sha256(user_id)
-        
-        # Retrieve user information based on the user ID from MongoDB
-        user_info = self._get_user_info(context, user_id)
-        
-        # Extract the voice file ID from the user information
-        voice_file_id = self._get_voice_id_from_user_info(context, user_info)
-        
+        # Get the voice file ID from the DAG run configuration
+        voice_file_id = context['dag_run'].conf['voice_file_id']
         # Generate the SHA256 hash of the voice file ID
         voice_file_id_hash = self._sha256(voice_file_id)
-        
+        # Generate the SHA256 hash of the user ID
+        user_info = self._find_user_by_voice_id(voice_file_id)
+        user_id = user_info["_id"]
+        user_id_hash = self._sha256(user_id)
+
         try:
             # Register the voice ID on the Smart Contract and get the transaction hash
             tx_hash = self._register_voice_id(web3, contract, user_id_hash, voice_file_id_hash, chain_id, nonce)

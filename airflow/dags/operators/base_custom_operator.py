@@ -1,3 +1,4 @@
+import tempfile
 from bson import ObjectId
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
@@ -143,3 +144,44 @@ class BaseCustomOperator(BaseOperator):
             self._log_to_mongodb(error_message, context, "ERROR")
             raise Exception(error_message)
         return file_id
+    
+    def _find_user_by_voice_id(self, voice_id):
+        """
+        Find user details by voice ID.
+
+        Parameters:
+        - voice_id (str): The voice ID of the user to search for.
+
+        Returns:
+        - dict or None: A dictionary containing the user details if found, or None if not found.
+        """
+        # Get a reference to the MongoDB collection
+        collection = self._get_mongodb_collection()
+        user_info = collection.find_one({"voice_id": voice_id})  # Find user details by voice ID
+        return user_info
+    
+    def _download_file_from_minio(self, context, file_path):
+        """
+        Downloads a file from MinIO to a temporary file.
+
+        Args:
+        - context (dict): The execution context.
+        - minio_client: MinIO client instance.
+        - file_path (str): Path to the file in MinIO.
+
+        Returns:
+        - str: Path to the downloaded temporary file.
+        """
+        try:
+            # Get MinIO client
+            minio_client = self._get_minio_client(context)
+            file_data = minio_client.get_object(self.minio_bucket_name, file_path)
+            with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+                temp_file_path = temp_file.name
+                temp_file.write(file_data.read())
+            self._log_to_mongodb(f"Downloaded file '{file_path}' from MinIO to temporary file", context, "INFO")
+            return temp_file_path
+        except Exception as e:
+            error_message = f"Error downloading file '{file_path}' from MinIO: {str(e)}"
+            self._log_to_mongodb(error_message, context, "ERROR")
+            raise e
