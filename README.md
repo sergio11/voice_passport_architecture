@@ -26,6 +26,7 @@
   <img src="https://img.shields.io/badge/Blockchain.com-121D33?logo=blockchaindotcom&logoColor=fff&style=for-the-badge" />
 </p>
 
+
 ## ✨ Features
 
 * **🔒 Advanced Voice Authentication**: VoicePassport harnesses the cutting-edge Resemblyzer technology to analyze and generate unique voice embeddings from user audio samples. These embeddings serve as the foundation for precise and trustworthy user authentication based on voice similarity.
@@ -37,6 +38,11 @@
 * **🚀 Streamlined Workflow Management**: Empowered by Apache Airflow, VoicePassport streamlines the authentication process with robust workflow management capabilities. Through automated task orchestration, including audio processing, embedding generation, and database integration, VoicePassport ensures smooth and dependable operation.
 
 * **👤 Intuitive User Experience:** Designed for user convenience, VoicePassport offers a hassle-free authentication experience. Users can effortlessly enroll their voice profiles and authenticate themselves with a simple voice command, eliminating the complexity of traditional password-based methods.
+
+<p align="center">
+  <img width="auto" height="250px" src="./doc/qdrant_logo.png" />
+  <img width="auto" height="250px" src="./doc/polygon_logo.png" />
+</p>
 
 ## 🛠️ Technologies Used
 
