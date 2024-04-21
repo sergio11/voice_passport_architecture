@@ -39,6 +39,10 @@
 
 * **👤 Intuitive User Experience:** Designed for user convenience, VoicePassport offers a hassle-free authentication experience. Users can effortlessly enroll their voice profiles and authenticate themselves with a simple voice command, eliminating the complexity of traditional password-based methods.
 
+<p align="center">
+  <img width="auto" height="250px" src="./doc/airflow_logo.png" />
+</p>
+
 ## 🛠️ Technologies Used
 
 * **🎤 Resemblyzer**: Advanced voice analysis tool for generating voice embeddings.
