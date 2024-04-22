@@ -1,8 +1,8 @@
-import datetime
+from datetime import datetime, timezone
 from flask import Flask, request
 import logging
-from api.helpers.jwt_helpers import validate_jwt, generate_jwt
-from api.helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
+from helpers.jwt_helpers import validate_jwt
+from helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
 from helpers.api_helpers import process_voice_file, create_response, validate_webhook_url
 from helpers.airflow_helpers import trigger_voice_id_change_state_dag, trigger_voice_registration_dag, trigger_voice_authentication_dag
 
@@ -18,9 +18,10 @@ app = Flask(__name__)
 
 @app.route(f"{BASE_URL_PREFIX}/schedule_user_registration", methods=['POST'])
 def schedule_user_registration():
-    fullname = request.form.get('fullname')
-    email = request.form.get('email')
-    result_webhook = request.form.get('result_webhook')
+    data = request.form
+    fullname = data.get('fullname')
+    email = data.get('email')
+    result_webhook = data.get('result_webhook')
 
     # Validate received data
     if not all([fullname, email, result_webhook]):
@@ -38,7 +39,7 @@ def schedule_user_registration():
     user_id = save_user_metadata(fullname, email, voice_file_id)
 
     # Trigger the registration DAG execution
-    response = trigger_voice_registration_dag(datetime.utcnow(), voice_file_id, result_webhook)
+    response = trigger_voice_registration_dag(datetime.now(timezone.utc), voice_file_id, result_webhook)
     if response.status_code == 200:
         return create_response("Success", 200, "User registration scheduled successfully.", data={"user_id": user_id})
     else:
@@ -58,7 +59,7 @@ def schedule_user_authentication():
     voice_file_id = process_voice_file(request, logger)
 
     # Trigger the authentication DAG execution
-    response = trigger_voice_authentication_dag(datetime.utcnow(), voice_file_id, result_webhook)
+    response = trigger_voice_authentication_dag(datetime.now(timezone.utc), voice_file_id, result_webhook)
     if response.status_code == 200:
         return create_response("Success", 200, "User authentication scheduled successfully.")
     else:
@@ -69,13 +70,13 @@ def schedule_user_authentication():
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/enable", methods=['PUT'])
 @validate_jwt
 def enable_user(decoded_token, user_id):
-    result_webhook = request.form.get('result_webhook')
+    result_webhook = request.json.get('result_webhook')
     return _change_user_state(decoded_token, user_id, True, result_webhook)
 
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/disable", methods=['PUT'])
 @validate_jwt
 def disable_user(decoded_token, user_id):
-    result_webhook = request.form.get('result_webhook')
+    result_webhook = request.json.get('result_webhook')
     return _change_user_state(decoded_token, user_id, False, result_webhook)
     
 @app.route(f"{BASE_URL_PREFIX}/accounts/current", methods=['GET'])
@@ -117,7 +118,7 @@ def _change_user_state(decoded_token, user_id, enable, result_webhook):
         return create_response("Forbidden", 403, "Unauthorized access.")
 
     # Trigger DAG execution
-    response = trigger_voice_id_change_state_dag(datetime.utcnow(), user_id, enable, result_webhook)
+    response = trigger_voice_id_change_state_dag(datetime.now(timezone.utc), user_id, enable, result_webhook)
     if response.status_code == 200:
         return create_response("Success", 200, "User state change scheduled successfully.")
     else:

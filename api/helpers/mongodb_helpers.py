@@ -1,6 +1,5 @@
-import datetime
+from datetime import datetime, timezone
 import os
-
 from bson import ObjectId
 from pymongo import MongoClient
 
@@ -12,7 +11,7 @@ MONGO_COLLECTION = os.environ.get("MONGO_DB_COLLECTION")
 # Function to save metadata about the user in MongoDB
 def save_user_metadata(fullname, email, voice_id):
     # Generate a timestamp for the video upload
-    timestamp = datetime.utcnow()
+    timestamp = datetime.now(timezone.utc)
     # Create metadata to be stored in MongoDB
     metadata = {
         "fullname": fullname,
@@ -24,7 +23,7 @@ def save_user_metadata(fullname, email, voice_id):
     db_collection = _connect_to_mongo()
     # Insert the metadata into the MongoDB collection and retrieve the user ID
     user_id = db_collection.insert_one(metadata).inserted_id
-    return user_id
+    return str(user_id)
 
 def find_user_by_voice_id(voice_id):
     """
