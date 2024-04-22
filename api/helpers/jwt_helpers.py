@@ -2,7 +2,7 @@ import os
 import jwt
 from flask import request
 from functools import wraps
-from api.helpers.api_helpers import create_response
+from api_helpers import create_response
 
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
