@@ -110,6 +110,30 @@ In summary, QDrant provides a comprehensive and highly efficient solution for ma
 
 ## Installation
 
+## Project Setup
+
+Below is the order in which tasks should be executed to set up the project:
+
+1. **Upload Contract ABI to MinIO**:
+   ```bash
+   rake voicepassport:upload_contract_abi_to_minio
+   ```
+2. **Build and Push Apache Airflow Image**:
+   ```bash
+   rake voicepassport:build_and_push_airflow_image
+   ```
+3. **Build and Push VoicePassport API Image**:
+   ```bash
+   rake voicepassport:build_and_push_voice_passport_api_image
+   ```
+4. **Deploy Architecture**:
+   ```bash
+   rake voicepassport:deploy
+   ```
+5. **Create Users in Apache Airflow**:
+ ```bash
+ rake voicepassport:create_apache_airflow_users
+   ```
 
 ### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
 
