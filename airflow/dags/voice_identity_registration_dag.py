@@ -40,33 +40,33 @@ with DAG('voice_identity_registration_dag', default_args=default_args, default_v
     # Define the task to upsert the extracted voice embeddings into QDrant for similarity search
     qdrant_embeddings_task = QDrantEmbeddingsOperator(
         task_id='qdrant_embeddings_task',
-        qdrant_uri=os.environ.get("QDRANT_URI"),
-        qdrant_api_key=os.environ.get("QDRANT_API_KEY"),
-        qdrant_collection=os.environ.get("QDRANT_COLLECTION"),
         mongo_uri=os.environ.get("MONGO_URI"),
         mongo_db=os.environ.get("MONGO_DB"),
         mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
         minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
         minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
         minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
-        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME"),
+        qdrant_uri=os.environ.get("QDRANT_URI"),
+        qdrant_api_key=os.environ.get("QDRANT_API_KEY"),
+        qdrant_collection=os.environ.get("QDRANT_COLLECTION")
     )
 
     # Define a task to register a VoiceID using a Smart Contract.
     register_voice_id_task = RegisterVoiceIDOperator(
         task_id='register_voice_id_task',
-        http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER"),
-        caller_address=os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS"),
-        caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
-        contract_address=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS"),
-        contract_abi=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"),
         mongo_uri=os.environ.get("MONGO_URI"),
         mongo_db=os.environ.get("MONGO_DB"),
         mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
         minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
         minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
         minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
-        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME"),
+        caller_address=os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS"),
+        caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
+        contract_address=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS"),
+        contract_abi=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"),
+        http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER")
     )
 
     process_result_webhook_task = ProcessResultWebhookOperator(

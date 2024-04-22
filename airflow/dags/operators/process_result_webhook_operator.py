@@ -7,19 +7,16 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
     @apply_defaults
     def __init__(
         self,
-        jwt_secret,
         *args, **kwargs
     ):
         """
         Initialize the operator.
 
         Inherits:
-        - jwt_secret (str): The secret key used for JWT encoding/decoding.
         - *args: Additional arguments.
         - **kwargs: Additional keyword arguments.
         """
         super().__init__(*args, **kwargs)
-        self.jwt_secret = jwt_secret
 
     def execute(self, context):
         # Log the start of the execution

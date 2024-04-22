@@ -15,13 +15,6 @@ class BaseWeb3CustomOperator(BaseCustomOperator):
     - caller_private_key (str): Private key of the caller.
     - contract_address (str): Address of the smart contract to interact with.
     - contract_abi (str): Filename of the contract's Application Binary Interface (ABI) stored in MinIO.
-    - mongo_uri (str): MongoDB URI.
-    - mongo_db (str): MongoDB database name.
-    - mongo_db_collection (str): MongoDB collection name.
-    - minio_endpoint (str): MinIO endpoint URL.
-    - minio_access_key (str): MinIO access key.
-    - minio_secret_key (str): MinIO secret key.
-    - minio_bucket_name (str): Name of the MinIO bucket where the contract ABI file is stored.
     """
 
     @apply_defaults
@@ -32,13 +25,6 @@ class BaseWeb3CustomOperator(BaseCustomOperator):
         caller_private_key,
         contract_address,
         contract_abi,
-        mongo_uri,
-        mongo_db,
-        mongo_db_collection,
-        minio_endpoint,
-        minio_access_key,
-        minio_secret_key,
-        minio_bucket_name,
         *args, **kwargs
     ):
         """
@@ -64,13 +50,6 @@ class BaseWeb3CustomOperator(BaseCustomOperator):
         self.caller_private_key = caller_private_key
         self.contract_address = contract_address
         self.contract_abi = contract_abi
-        self.mongo_uri = mongo_uri
-        self.mongo_db = mongo_db
-        self.mongo_db_collection = mongo_db_collection
-        self.minio_endpoint = minio_endpoint
-        self.minio_access_key = minio_access_key
-        self.minio_secret_key = minio_secret_key
-        self.minio_bucket_name = minio_bucket_name
 
     def _sha256(self, data):
         hash_object = hashlib.sha256(data.encode())
