@@ -11,9 +11,6 @@ COPY app.py app.py
 # Copy all helpers from the helpers directory into the container
 COPY helpers/ helpers/
 
-# Install gcc, which is part of the build-essential package
-RUN apt-get update && apt-get install -y gcc
-
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
