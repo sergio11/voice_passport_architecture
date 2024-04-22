@@ -2,7 +2,7 @@ import os
 import re
 import tempfile
 from flask import jsonify
-from minio_helpers import handle_minio_storage
+from helpers.minio_helpers import handle_minio_storage
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3'}
 
@@ -17,7 +17,7 @@ def process_voice_file(request, logger):
     return voice_file_id
 
 def validate_webhook_url(result_webhook, logger):
-    if not re.match(r'^https?://(?:www\.)?\w+\.\w{2,3}(?:/\w*)?$', result_webhook):
+    if not re.match(r'^https?://\S+$', result_webhook):
         logger.error("Invalid webhook URL format")
         return False
     return True
