@@ -7,6 +7,7 @@ from minio import Minio
 from datetime import datetime
 
 class BaseCustomOperator(BaseOperator):
+    
     @apply_defaults
     def __init__(
         self,

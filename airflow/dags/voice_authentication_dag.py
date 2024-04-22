@@ -39,33 +39,33 @@ with DAG('voice_authentication_dag', default_args=default_args, default_view="gr
 
     find_most_similar_voice_task = FindMostSimilarVoiceOperator(
         task_id='find_most_similar_voice_task',
-        qdrant_uri=os.environ.get("QDRANT_URI"),
-        qdrant_api_key=os.environ.get("QDRANT_API_KEY"),
-        qdrant_collection=os.environ.get("QDRANT_COLLECTION"),
         mongo_uri=os.environ.get("MONGO_URI"),
         mongo_db=os.environ.get("MONGO_DB"),
         mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
         minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
         minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
         minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
-        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME"),
+        qdrant_uri=os.environ.get("QDRANT_URI"),
+        qdrant_api_key=os.environ.get("QDRANT_API_KEY"),
+        qdrant_collection=os.environ.get("QDRANT_COLLECTION"),
     )
 
     verify_voice_id_task = VerifyVoiceIdOperator(
         task_id='verify_voice_id_task',
-        jwt_secret=os.environ.get("JWT_SECRET_KEY"),
+        mongo_uri=os.environ.get("MONGO_URI"),
+        mongo_db=os.environ.get("MONGO_DB"),
+        mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
+        minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
+        minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
+        minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
+        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME"),
         http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER"),
         caller_address=os.environ.get("VOICE_ID_VERIFIER_CALLER_ADDRESS"),
         caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
         contract_address=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS"),
         contract_abi=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"),
-        mongo_uri=os.environ.get("MONGO_URI"),
-        mongo_db=os.environ.get("MONGO_DB"),
-        mongo_db_collection=os.environ.get("MONGO_DB_COLLECTION"),
-        minio_endpoint=os.environ.get("MINIO_ENDPOINT"),
-        minio_access_key=os.environ.get("MINIO_ACCESS_KEY"),
-        minio_secret_key=os.environ.get("MINIO_SECRET_KEY"),
-        minio_bucket_name=os.environ.get("MINIO_BUCKET_NAME")
+        jwt_secret=os.environ.get("JWT_SECRET_KEY")
     )
     
     process_result_webhook_task = ProcessResultWebhookOperator(

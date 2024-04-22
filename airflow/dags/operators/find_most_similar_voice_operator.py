@@ -1,8 +1,8 @@
-from airflow.models import BaseOperator
+from operators.base_custom_operator import BaseCustomOperator
 from airflow.utils.decorators import apply_defaults
 from qdrant_client import QdrantClient
 
-class FindMostSimilarVoiceOperator(BaseOperator):
+class FindMostSimilarVoiceOperator(BaseCustomOperator):
     """
     Custom Airflow operator to find the most similar voice based on audio embeddings.
 
