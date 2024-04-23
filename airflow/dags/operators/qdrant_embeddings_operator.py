@@ -42,11 +42,19 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
     def execute(self, context):
        # Log the start of the execution
        self._log_to_mongodb(f"Starting execution of QDrantOperator", context, "INFO")
-       # Get the configuration passed to the DAG from the execution context
-       dag_run_conf = context['dag_run'].conf
+       args = context['task_instance'].xcom_pull(task_ids='generate_voice_embedding_task')
        # Get the user_id and embeddings from the configuration
-       voice_file_id = dag_run_conf['voice_file_id']
-       embeddings = dag_run_conf['embeddings']
+       voice_file_id = args['voice_file_id']
+       embeddings = args['embeddings']
+
+       if voice_file_id is None:
+           self._log_to_mongodb("voice_file_id is not defined", context, "ERROR")
+           raise ValueError("voice_file_id is not defined")
+
+       if embeddings is None:
+            self._log_to_mongodb("embeddings is not defined", context, "ERROR")
+            raise ValueError("embeddings is not defined")
+
        self._log_to_mongodb(f"Received voice_file_id: {voice_file_id}", context, "INFO")
        try:
             # Initialize QDrant client
@@ -57,7 +65,6 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
 
             # Upsert embeddings into the collection
             self._upsert_embeddings(client, voice_file_id, embeddings)
-            del context['dag_run'].conf['embeddings']
             # Log success
             self._log_to_mongodb(f"Embeddings successfully upserted into QDrant", context, "INFO")
        except Exception as e:
