@@ -52,7 +52,7 @@ class BaseWeb3CustomOperator(BaseCustomOperator):
         self.contract_abi = contract_abi
 
     def _sha256(self, data):
-        hash_object = hashlib.sha256(data.encode())
+        hash_object = hashlib.sha256(str(data).encode())
         return hash_object.hexdigest()
 
     def _log_transaction_details(self, tx_receipt, context):
