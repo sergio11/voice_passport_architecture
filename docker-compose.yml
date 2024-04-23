@@ -251,3 +251,5 @@ services:
       - "6334:6334"
     volumes:
       - ./data/qdrant_storage:/qdrant/storage
+    networks:
+      - voice_passport_network
