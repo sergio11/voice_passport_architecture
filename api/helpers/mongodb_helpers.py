@@ -25,6 +25,26 @@ def save_user_metadata(fullname, email, voice_id):
     user_id = db_collection.insert_one(metadata).inserted_id
     return str(user_id)
 
+def find_user_by_email_or_fullname(email=None, fullname=None):
+    """
+    Find user details by email or fullname.
+
+    Parameters:
+    - email (str): The email of the user to search for.
+    - fullname (str): The fullname of the user to search for.
+
+    Returns:
+    - dict or None: A dictionary containing the user details if found, or None if not found.
+    """
+    db_collection = _connect_to_mongo()  # Establish connection to MongoDB
+    query = {}
+    if email:
+        query["email"] = email
+    if fullname:
+        query["fullname"] = fullname
+    user_info = db_collection.find_one(query)  # Find user details by email or fullname
+    return user_info
+
 def find_user_by_voice_id(voice_id):
     """
     Find user details by voice ID.
