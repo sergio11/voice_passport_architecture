@@ -127,7 +127,6 @@ class BaseCustomOperator(BaseOperator):
         self._log_to_mongodb(f"Retrieved user from MongoDB: {user_id}", context, "INFO")
         return user_info
     
-    
     def _get_voice_id_from_user_info(self, context, user_info):
         """
         Retrieves the user information and extracts the voice_file_id.
