@@ -51,10 +51,12 @@ class ChangeVoiceIdVerificationStateOperator(BaseWeb3CustomOperator):
         # Get the user ID from the DAG run configuration
         dag_run = context['dag_run']
         user_id = dag_run.conf['user_id']
+
         if not user_id:
             raise ValueError("The 'user_id' parameter cannot be empty or None.")
         
         is_enabled = dag_run.conf['is_enabled']
+
         if not isinstance(is_enabled, bool):
             raise ValueError("The 'is_enabled' parameter must be a boolean.")
         # Connect to Web3 provider
@@ -95,4 +97,8 @@ class ChangeVoiceIdVerificationStateOperator(BaseWeb3CustomOperator):
         self._log_to_mongodb(f"Execution of ChangeVoiceIdVerificationState completed", context, "INFO")
         result = tx_receipt['status'] == 1
         # Return information about the executed operation
-        return {"user_id": str(user_id), "result": result}
+        return {"user_id": str(user_id), "result": {
+            "type": "change_state",
+            "result": result, 
+            "user_id": str(user_id)
+        }}

@@ -54,9 +54,10 @@ class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
         self._log_to_mongodb(f"Execution of VerifyVoiceIdOperator completed", context, "INFO")
         # Return information about the executed operation
         return {"user_id": user_id, "result": {
-            "verification_result": result, 
+            "type": "authentication",
+            "result": result, 
             "session_token": session_token,
-            "user_id": user_id
+            "user_id": str(user_id)
         }}
 
         
