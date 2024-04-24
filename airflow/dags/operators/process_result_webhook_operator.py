@@ -5,18 +5,11 @@ import requests
 class ProcessResultWebhookOperator(BaseCustomOperator):
     """
     Executes a task to process and send result data to a specified webhook.
-
-    :param result_webhook: The URL of the webhook to send the result data to.
-    :type result_webhook: str
-    :param tasks: A list of task IDs to pull result data from.
-    :type tasks: list[str]
     """
 
     @apply_defaults
     def __init__(
         self,
-        result_webhook: str,
-        tasks: list[str],
         *args, **kwargs
     ):
         """
@@ -27,8 +20,6 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
         - **kwargs: Additional keyword arguments.
         """
         super().__init__(*args, **kwargs)
-        self.result_webhook = result_webhook
-        self.tasks = tasks
 
     def execute(self, context):
         """
@@ -51,13 +42,16 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
         dag_run_conf = context['dag_run'].conf
         result_webhook = dag_run_conf.get('result_webhook')
 
+        tasks = ['register_voice_id_task', 'verify_voice_id_task', 'change_voice_id_verification_state_task']
+        args_list = [context['task_instance'].xcom_pull(task_ids=task) for task in tasks]
+        
         # Retrieve and combine result data from specified tasks
         combined_args = {}
-        for task_id in self.tasks:
-            args = context['task_instance'].xcom_pull(task_ids=task_id)
+        for task, args in zip(tasks, args_list):
             if args:
-                combined_args.update(args[0])
-
+                self._log_to_mongodb(f"Args for task '{task}': {args}", context, "INFO")
+                combined_args.update(args)
+        
         # Extract user ID and result data
         user_id = combined_args.get('user_id')
         result_data = combined_args.get('result')
