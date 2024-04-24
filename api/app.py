@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from flask import Flask, request
 import logging
 from helpers.jwt_helpers import validate_jwt
-from helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, update_user_register_planned_date, find_user_by_voice_id
+from helpers.mongodb_helpers import delete_user_details, find_user_details, save_user_metadata, find_user_by_email_or_fullname
 from helpers.api_helpers import process_voice_file, create_response, validate_webhook_url
 from helpers.airflow_helpers import trigger_voice_id_change_state_dag, trigger_voice_registration_dag, trigger_voice_authentication_dag
 
@@ -31,6 +31,12 @@ def schedule_user_registration():
     # Validate the format of the webhook URL
     if not validate_webhook_url(result_webhook, logger):
         return create_response("Error", 400, "Invalid webhook URL format")
+    
+    # Check if the user already exists
+    existing_user = find_user_by_email_or_fullname(email=email, fullname=fullname)
+    if existing_user:
+        logger.error("User already exists")
+        return create_response("Error", 400, "User already exists")
 
     # Process the voice file
     voice_file_id = process_voice_file(request, logger)
