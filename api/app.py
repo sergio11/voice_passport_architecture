@@ -72,6 +72,11 @@ def schedule_user_authentication():
         logger.error(f"Error triggering authentication DAG execution: {response.text}")
         return create_response("Error", response.status_code, "Error triggering user authentication scheduling.")
 
+@app.route(f"{BASE_URL_PREFIX}/completed", methods=['POST'])
+def process_completed_webhook():
+    data = request.json
+    logger.info(f"Received JSON data: {data}")
+    return create_response("Success", 200, "")
 
 @app.route(f"{BASE_URL_PREFIX}/accounts/<string:user_id>/enable", methods=['PUT'])
 @validate_jwt
