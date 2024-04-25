@@ -67,7 +67,8 @@ with DAG('voice_authentication_dag', default_args=default_args, default_view="gr
         caller_private_key=os.environ.get("VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY"),
         contract_address=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ADDRESS"),
         contract_abi=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME"),
-        jwt_secret=os.environ.get("JWT_SECRET_KEY")
+        jwt_secret=os.environ.get("JWT_SECRET_KEY"),
+        jwt_duration_hours=os.environ.get("JWT_DURATION_HOURS_KEY")
     )
     
     # Task to process the result and send it to a webhook
