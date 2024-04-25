@@ -28,11 +28,6 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
         This method pulls result data from the specified tasks,
         combines the data, and sends it to the specified webhook.
 
-        :param context: The context object, containing metadata related to the execution.
-        :type context: dict
-        :return: A dictionary containing the user ID extracted from the result data.
-        :rtype: dict
-        :raises ValueError: If the result webhook, user ID, or result data is not provided.
         """
 
         # Log the start of the execution
@@ -52,19 +47,13 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
                 self._log_to_mongodb(f"Args for task '{task}': {args}", context, "INFO")
                 combined_args.update(args)
         
-        # Extract user ID and result data
-        user_id = combined_args.get('user_id')
+        # Extract result data
         result_data = combined_args.get('result')
 
         # Validate if result_webhook is present
         if not result_webhook:
             self._log_to_mongodb("No result webhook provided", context, "ERROR")
             raise ValueError("No result webhook provided")
-
-        # Validate if user_id is present
-        if not user_id:
-            self._log_to_mongodb("No user ID provided", context, "ERROR")
-            raise ValueError("No user ID provided")
 
         # Validate if result_data is present
         if not result_data:
@@ -86,4 +75,4 @@ class ProcessResultWebhookOperator(BaseCustomOperator):
         # Log the end of the execution
         self._log_to_mongodb(f"Execution of ProcessResultWebhookOperator completed", context, "INFO")
 
-        return {"user_id": user_id}
+        return
