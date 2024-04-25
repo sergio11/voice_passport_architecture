@@ -97,7 +97,7 @@ class ChangeVoiceIdVerificationStateOperator(BaseWeb3CustomOperator):
         self._log_to_mongodb(f"Execution of ChangeVoiceIdVerificationState completed", context, "INFO")
         result = tx_receipt['status'] == 1
         # Return information about the executed operation
-        return {"user_id": str(user_id), "result": {
+        return {"result": {
             "type": "change_state",
             "result": result, 
             "user_id": str(user_id)

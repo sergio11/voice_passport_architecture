@@ -108,7 +108,7 @@ class RegisterVoiceIDOperator(BaseWeb3CustomOperator):
         self._log_to_mongodb(f"Execution of RegisterVoiceIDOperator completed", context, "INFO")
             
         # Return information about the executed operation
-        return {"user_id": user_id, "result": {
+        return {"result": {
             "type": "identity_registration",
             "result": True, 
             "user_id": str(user_id)
