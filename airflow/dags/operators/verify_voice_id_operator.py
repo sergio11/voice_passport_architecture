@@ -5,24 +5,38 @@ from datetime import datetime, timedelta, timezone
 
 class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
     """
-    VerifyVoiceIdOperator is responsible for verifying the authenticity of a voice ID using a Smart Contract on the Ethereum blockchain.
+    An operator to verify a user's voice ID using a Smart Contract on the Ethereum blockchain.
 
-    Attributes:
+    Inherits:
+    - BaseWeb3CustomOperator: Base class for Ethereum blockchain interaction operators.
+
+    Parameters:
     - jwt_secret (str): The secret key used for JWT token generation.
-
-    Methods:
-    - generate_jwt(user_id): Generate a JWT token with user ID as claim.
-    - execute(context): Execute the operator to verify the voice ID authenticity.
+    - jwt_duration_hours (int): The duration, in hours, for which the JWT token will be valid.
+    - *args: Additional arguments.
+    - **kwargs: Additional keyword arguments.
     """
+    
 
     @apply_defaults
     def __init__(
         self,
         jwt_secret,
+        jwt_duration_hours,
         *args, **kwargs
     ):
+        """
+        Initialize the operator.
+
+        Parameters:
+        - jwt_secret (str): The secret key used for JWT token generation.
+        - jwt_duration_hours (int): The duration, in hours, for which the JWT token will be valid.
+        - *args: Additional arguments.
+        - **kwargs: Additional keyword arguments.
+        """
         super().__init__(*args, **kwargs)
         self.jwt_secret = jwt_secret
+        self.jwt_duration_hours = jwt_duration_hours
 
     def generate_jwt(self, user_id):
         """
@@ -34,12 +48,21 @@ class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
         Returns:
         - str: The generated JWT token.
         """
-        token_expiry = datetime.now(timezone.utc) + timedelta(hours=1)  # Token expires in 1 hour
+        token_expiry = datetime.now(timezone.utc) + timedelta(hours=self.jwt_duration_hours)
         token_payload = {'user_id': user_id, 'exp': token_expiry}
         jwt_token = jwt.encode(token_payload, self.jwt_secret, algorithm='HS256')
         return jwt_token
 
     def execute(self, context):
+        """
+        Execute the operator.
+
+        Parameters:
+        - context (dict): The execution context.
+
+        Returns:
+        - dict: The result of the operator execution.
+        """
         # Log the start of the execution
         self._log_to_mongodb(f"Starting execution of VerifyVoiceIdOperator", context, "INFO")
         # Get task arguments
@@ -65,15 +88,25 @@ class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
          # Generate the SHA256 hash of the voice ID
         voice_file_id_hash = self._sha256(voice_id)
         result = contract.functions.verifyVoiceID(user_id_hash, voice_file_id_hash).call() 
-        session_token = self.generate_jwt(user_id)
+
+        if result:
+            # Generate session token
+            session_token = self.generate_jwt(user_id)
+            result = {"result": {
+                "type": "authentication",
+                "isSuccess": True, 
+                "session_token": session_token,
+                "user_id": user_id
+            }}
+        else:
+            result = {
+                "type": "authentication",
+                "isSuccess": False
+            }
+
         # Log completion of operator execution
         self._log_to_mongodb(f"Execution of VerifyVoiceIdOperator completed", context, "INFO")
         # Return information about the executed operation
-        return {"result": {
-            "type": "authentication",
-            "result": result, 
-            "session_token": session_token,
-            "user_id": user_id
-        }}
+        return {"result": result}
 
         
