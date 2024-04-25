@@ -75,9 +75,18 @@ class FindMostSimilarVoiceOperator(BaseCustomOperator):
         # Log the start of the execution
         self._log_to_mongodb(f"Starting execution of FindMostSimilarVoiceOperator", context, "INFO")
         # Get the configuration passed to the DAG from the execution context
-        dag_run_conf = context['dag_run'].conf
+        args = context['task_instance'].xcom_pull(task_ids='generate_voice_embedding_task')
+        # Get the user_id and embeddings from the configuration
+        voice_file_id = args['voice_file_id']
+        embeddings = args['embeddings']
 
-        embeddings = dag_run_conf['embeddings']
+        if voice_file_id is None:
+            self._log_to_mongodb("voice_file_id is not defined", context, "ERROR")
+            raise ValueError("voice_file_id is not defined")
+
+        if embeddings is None:
+            self._log_to_mongodb("embeddings is not defined", context, "ERROR")
+            raise ValueError("embeddings is not defined")
 
         qdrant_client = self._initialize_qdrant_client()
         # Search related embeddings
@@ -87,7 +96,7 @@ class FindMostSimilarVoiceOperator(BaseCustomOperator):
         most_similar_audio = max(results, key=lambda result: result.score)
 
         # Log the end of the execution
-        self._log_to_mongodb(f"Execution of FindMostSimilarVoiceOperator completed", context, "INFO")
+        self._log_to_mongodb(f"Execution of FindMostSimilarVoiceOperator completed with voice matched id {str(most_similar_audio.id)} and score {most_similar_audio.score}", context, "INFO")
 
         # Return information about the executed operation
         return {"voice_matched_id": str(most_similar_audio.id)}
