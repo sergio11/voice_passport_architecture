@@ -212,6 +212,21 @@ cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
 VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
 ```
 
+## Screenshots 📷
+Here are some screenshots that demonstrate the functionality of Voice Passport:
+
+<p align="center">
+  <img src="./doc/snapshots/picture_1.PNG" />
+  <img src="./doc/snapshots/picture_2.PNG" />
+  <img src="./doc/snapshots/picture_3.PNG" />
+  <img src="./doc/snapshots/picture_4.PNG" />
+  <img src="./doc/snapshots/picture_5.PNG" />
+  <img src="./doc/snapshots/picture_6.PNG" />
+  <img src="./doc/snapshots/picture_7.PNG" />
+  <img src="./doc/snapshots/picture_8.PNG" />
+</p>
+
+
 ## Task Descriptions
 
 The following table provides descriptions and examples of tasks available in the Rakefile for deploying and managing your environment.
