@@ -17,8 +17,7 @@ def save_user_metadata(fullname, email, voice_id):
         "fullname": fullname,
         "email": email,
         "voice_id": voice_id,
-        "timestamp": timestamp,
-        "planned": False  # Initial status, not yet planned
+        "timestamp": timestamp
     }
     db_collection = _connect_to_mongo()
     # Insert the metadata into the MongoDB collection and retrieve the user ID
