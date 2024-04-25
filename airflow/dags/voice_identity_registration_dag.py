@@ -69,6 +69,7 @@ with DAG('voice_identity_registration_dag', default_args=default_args, default_v
         http_provider=os.environ.get("VOICE_ID_VERIFIER_HTTP_PROVIDER")
     )
 
+    # Task to process the result and send it to a webhook
     process_result_webhook_task = ProcessResultWebhookOperator(
         task_id='process_result_webhook_task',
         mongo_uri=os.environ.get("MONGO_URI"),

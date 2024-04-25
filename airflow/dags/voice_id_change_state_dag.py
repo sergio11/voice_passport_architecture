@@ -21,6 +21,7 @@ with DAG('voice_id_change_state_dag', default_args=default_args, default_view="g
 
     # Define the task instances for each operator
 
+    # Task to change the verification state of a voice ID
     change_voice_id_verification_state_task = ChangeVoiceIdVerificationStateOperator(
         task_id='change_voice_id_verification_state_task',
         mongo_uri=os.environ.get("MONGO_URI"),
@@ -37,6 +38,7 @@ with DAG('voice_id_change_state_dag', default_args=default_args, default_view="g
         contract_abi=os.environ.get("VOICE_ID_VERIFIER_CONTRACT_ABI_NAME")
     )
 
+    # Task to process the result of changing the verification state and send it to a webhook
     process_result_webhook_task = ProcessResultWebhookOperator(
         task_id='process_result_webhook_task',
         mongo_uri=os.environ.get("MONGO_URI"),
