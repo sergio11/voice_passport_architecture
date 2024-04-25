@@ -77,9 +77,9 @@ class BaseWeb3CustomOperator(BaseCustomOperator):
         Check if connection to Web3 provider is successful.
         """
         if web3.is_connected():
-            self._log_to_mongodb("Connection Successful", context, "INFO")
+            self._log_to_mongodb("web3 connection opened successfully", context, "INFO")
         else:
-            self._log_to_mongodb("Connection Failed", context, "ERROR")
+            self._log_to_mongodb("web3 connection Failed", context, "ERROR")
             raise Exception("Failed to connect to Web3 provider")
 
     def _get_chain_id(self, web3):
