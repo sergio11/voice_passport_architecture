@@ -63,6 +63,8 @@
 
 ## Unveiling Architecture 🏛️
 
+In the VoicePassport platform, various architectural components work in harmony to ensure seamless voice authentication and user management functionalities. Let's explore the purpose and role of each element:
+
 <img width="auto" src="./doc/voice_passport_architecture_diagram.jpg" />
 
 1. **Enrollment** 🎤: Users enroll and register their voice profiles by providing audio samples. These audio samples are processed by Resemblyzer, an advanced voice analysis tool, to generate unique voice embeddings. These voice embeddings capture the distinctive characteristics of each user's voice accurately and securely. Once generated, these embeddings are stored in a database for later use in authentication.
