@@ -273,6 +273,32 @@ The following table provides descriptions and examples of tasks available in the
 
 To execute any of these tasks, use the `rake` command followed by the task name. For example, to deploy VoicePassport, run `rake voicepassport:deploy`.
 
+## Services Overview
+
+Below is a list of services available locally, each with its associated port number and a short description of its purpose. These services are used in the VoicePassport architecture for various functions, including data storage, database management, and API services. Understanding these services and their ports will be helpful when working with the VoicePassport environment.
+
+| Service Name                   | Ports                      | Purpose                                                                                        |
+|--------------------------------|----------------------------|------------------------------------------------------------------------------------------------|
+| voice_passport_minio1         |                            | Object and data storage                                                                       |
+| voice_passport_minio2         |                            | Object and data storage                                                                       |
+| voice_passport_minio3         |                            | Object and data storage                                                                       |
+| voice_passport_minio_haproxy  | 9000 (MinIO), 1936 (Stats) | Load balancer for MinIO                                                                       |
+| voice_passport_mongo          | 27017                      | NoSQL database                                                                                |
+| voice_passport_mongo_express  | 9001                       | Web interface to administer MongoDB                                                           |
+| voice_passport_redis          |                            | Cache storage and message broker for Apache Airflow                                            |
+| voice_passport_postgres       | 5432                       | Relational database for Apache Airflow                                                         |
+| voice_passport_pgadmin        | 9002                       | Web interface to administer PostgreSQL                                                         |
+| voice_passport_airflow_webserver| 9003                      | Apache Airflow web server for workflow management                                              |
+| voice_passport_celery_flower  | 9004 (Celery), 9005 (Web), 9006 (Stats) | Web-based tool to monitor and manage Celery clusters                                   |
+| voice_passport_airflow_scheduler| 9007                      | Task scheduler for Apache Airflow                                                              |
+| voice_passport_airflow_worker_1|                           | Apache Airflow task processing                                                                 |
+| voice_passport_api_service_1  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_2  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_3  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_haproxy| 9008 (API), 1937 (Stats)| Load balancer for VoicePassport API services                                                   |
+| voice_passport_qdrant         | 6333 (gRPC), 6334 (HTTP)  | Database for storing and querying vectors                                                      |
+
+
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
