@@ -8,6 +8,8 @@
 
 💼💬 VoicePassport offers a reliable and efficient means of authentication, enabling seamless user access to various applications and services while ensuring a high level of security. With its innovative approach to voice-based authentication, VoicePassport provides a convenient and dependable solution for organizations seeking robust identity verification mechanisms.
 
+🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
+
 <p align="center">
   <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white" />
   <img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white" />
@@ -337,10 +339,15 @@ This project is licensed under the [MIT License](LICENSE).
 VoicePassport Architecture is developed and maintained by **Sergio Sánchez Sánchez** (Dream Software). Special thanks to the open-source community and the contributors who have made this project possible.
 If you have any questions, feedback, or suggestions, feel free to reach out at dreamsoftware92@gmail.com.
 
+## Acknowledgements 🙏
+
+🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
+
 ## Please Share & Star the repository to keep me motivated.
-  <a href = "https://github.com/sergio11/voice_passport_architecture/stargazers">
-     <img src = "https://img.shields.io/github/stars/sergio11/voice_passport_architecture" />
-  </a>
+
+<a href = "https://github.com/sergio11/voice_passport_architecture/stargazers">
+   <img src = "https://img.shields.io/github/stars/sergio11/voice_passport_architecture" />
+</a>
 
 
 
