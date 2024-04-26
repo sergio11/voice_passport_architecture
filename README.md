@@ -110,30 +110,7 @@ In summary, QDrant provides a comprehensive and highly efficient solution for ma
 
 ## Installation
 
-## Project Setup
-
-Below is the order in which tasks should be executed to set up the project:
-
-1. **Upload Contract ABI to MinIO**:
-   ```bash
-   rake voicepassport:upload_contract_abi_to_minio
-   ```
-2. **Build and Push Apache Airflow Image**:
-   ```bash
-   rake voicepassport:build_and_push_airflow_image
-   ```
-3. **Build and Push VoicePassport API Image**:
-   ```bash
-   rake voicepassport:build_and_push_voice_passport_api_image
-   ```
-4. **Deploy Architecture**:
-   ```bash
-   rake voicepassport:deploy
-   ```
-5. **Create Users in Apache Airflow**:
- ```bash
- rake voicepassport:create_apache_airflow_users
-   ```
+In this section I will provide an explanation about how to setup the whole project architecture.
 
 ### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
 
@@ -198,7 +175,6 @@ VoiceIDVerifier
   5 passing (4s)
 ```
 
-
 You can deploy your own VoiceIdVerifier DApp instance using the following command:
 
 ```
@@ -211,6 +187,51 @@ The project has been deployed on the Polygon PoS Amoy testnet, the address of th
 cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
 VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
 ```
+
+### Environment configuration
+
+It is necessary preparing the environment file called `.env` placed at the root folder which contains a lot of params to configure the services used in the architecture
+
+```
+## QDrant Configuration
+QDRANT_URI=http://voice_passport_qdrant:6333
+QDRANT_API_KEY=
+QDRANT_COLLECTION=user_voice_embeddings
+
+## VoiceIdVerifierDApp - Alchemy - Polygon PoS
+VOICE_ID_VERIFIER_HTTP_PROVIDER=https://polygon-amoy.g.alchemy.com/v2/api_token
+VOICE_ID_VERIFIER_CALLER_ADDRESS=[[CALLER_ADDRESS]]
+VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY=[[PRIVATE_KEY]]
+VOICE_ID_VERIFIER_CONTRACT_ADDRESS=[[CONTRACT_ADDRESS]]
+VOICE_ID_VERIFIER_CONTRACT_ABI_NAME=VoiceIDVerifier.json
+....................
+....................
+```
+
+### Platform Setup
+
+Below is the order in which tasks should be executed to set up the project:
+
+1. **Upload Contract ABI to MinIO**:
+   ```bash
+   rake voicepassport:upload_contract_abi_to_minio
+   ```
+2. **Build and Push Apache Airflow Image**:
+   ```bash
+   rake voicepassport:build_and_push_airflow_image
+   ```
+3. **Build and Push VoicePassport API Image**:
+   ```bash
+   rake voicepassport:build_and_push_voice_passport_api_image
+   ```
+4. **Deploy Architecture**:
+   ```bash
+   rake voicepassport:deploy
+   ```
+5. **Create Users in Apache Airflow**:
+  ```bash
+  rake voicepassport:create_apache_airflow_users
+  ```
 
 ## Screenshots 📷
 Here are some screenshots that demonstrate the functionality of Voice Passport:
