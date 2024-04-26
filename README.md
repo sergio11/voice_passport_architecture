@@ -348,6 +348,10 @@ If you have any questions, feedback, or suggestions, feel free to reach out at d
 
 🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
 
+## Visitors Count
+
+<img width="auto" src="https://profile-counter.glitch.me/voice_passport_architecture/count.svg" />
+
 ## Please Share & Star the repository to keep me motivated.
 
 <a href = "https://github.com/sergio11/voice_passport_architecture/stargazers">
