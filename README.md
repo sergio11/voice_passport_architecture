@@ -237,13 +237,28 @@ Below is the order in which tasks should be executed to set up the project:
 Here are some screenshots that demonstrate the functionality of Voice Passport:
 
 <p align="center">
+  It is possible to manage the information stored in QDrant by accessing its dashboard. We can visualize the created collections and stored embeddings, and even perform similarity searches.
   <img src="./doc/snapshots/picture_1.PNG" />
+
+  Each operator implemented in each of the Apache Airflow DAGs stores tracking records in MongoDB that we can analyze and track in order to inspect their operation.
   <img src="./doc/snapshots/picture_2.PNG" />
+  
+  Through the Apache Airflow dashboard, it is possible to monitor the operation of the DAGs and analyze their performance and various metrics.
   <img src="./doc/snapshots/picture_3.PNG" />
+
+  It's possible to examine details about task execution and the provided execution configuration.
   <img src="./doc/snapshots/picture_4.PNG" />
+
+  Through the Alchemy dashboard, it's possible to monitor the different transactions executed and various details regarding gas consumption or the block number where the transaction was mined.
   <img src="./doc/snapshots/picture_5.PNG" />
+
+  It's also possible to visit the Polygon Block Explorer to obtain more details about the mined transaction.
   <img src="./doc/snapshots/picture_6.PNG" />
+
+  The platform offers a REST API through which it's possible to interact with the system, initiate the registration of new users, and perform authentications.
   <img src="./doc/snapshots/picture_7.PNG" />
+
+  Through the Apache Airflow UI, it's possible to examine the operation of the registered DAGs, identify the number of failed, queued, and completed tasks...
   <img src="./doc/snapshots/picture_8.PNG" />
   <img src="./doc/snapshots/picture_9.PNG" />
 </p>
