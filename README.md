@@ -224,6 +224,7 @@ Here are some screenshots that demonstrate the functionality of Voice Passport:
   <img src="./doc/snapshots/picture_6.PNG" />
   <img src="./doc/snapshots/picture_7.PNG" />
   <img src="./doc/snapshots/picture_8.PNG" />
+  <img src="./doc/snapshots/picture_9.PNG" />
 </p>
 
 
