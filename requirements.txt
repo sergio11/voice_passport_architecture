@@ -1,2 +1,0 @@
-Resemblyzer==0.1.4
-numpy==1.26.4
