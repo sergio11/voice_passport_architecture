@@ -1,4 +1,4 @@
-# VoicePassport: Your Trusted Voice Authentication Companion 🎙️🔒
+# VoicePassport: Your Trusted Voice Authentication Solution 🎙️🔐
 
 <img width="auto" height="250px" align="left" src="./doc/voice_passport_logo.PNG" />
 
