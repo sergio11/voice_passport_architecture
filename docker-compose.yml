@@ -201,6 +201,22 @@ services:
     networks:
       - voice_passport_network
 
+  # Apache Airflow worker containers
+  voice_passport_airflow_worker_2:
+    image: ssanchez11/voice_passport_apache_airflow:0.0.1
+    container_name: voice-passport-airflow-worker-2
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - voice_passport_airflow_scheduler
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/packages:/usr/local/airflow/packages
+    command: worker
+    networks:
+      - voice_passport_network
+
   # VoicePassport API Service
   voice_passport_api_service_1:
     image: ssanchez11/voice_passport_api_service:0.0.1
