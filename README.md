@@ -54,6 +54,7 @@
 * **🔗 Web3**: Python library for interacting with Ethereum blockchain.
 * **📝 Solidity**: Programming language for writing smart contracts on the Ethereum blockchain.
 * **🟣 Polygon PoS**: Scalable Ethereum sidechain for fast and low-cost transactions.
+* **🔬 Alchemy**: An analytics platform that provides insights into blockchain transactions, allowing users to monitor and analyze transaction data on the Ethereum blockchain.
 * **📦 MinIO**: Object storage service for storing voice samples files.
 * **🍃 MongoDB**: NoSQL database for storing user metadata and authentication data.
 * **🌀 Apache Airflow**: Workflow management tool for automation of audio processing tasks and database integration.
@@ -61,6 +62,10 @@
 * **🔀 HAProxy**: Load balancer for distributing incoming traffic across multiple Docker containers.
 
 ## Unveiling Architecture 🏛️
+
+In the VoicePassport platform, various architectural components work in harmony to ensure seamless voice authentication and user management functionalities. Let's explore the purpose and role of each element:
+
+<img width="auto" src="./doc/voice_passport_architecture_diagram.jpg" />
 
 1. **Enrollment** 🎤: Users enroll and register their voice profiles by providing audio samples. These audio samples are processed by Resemblyzer, an advanced voice analysis tool, to generate unique voice embeddings. These voice embeddings capture the distinctive characteristics of each user's voice accurately and securely. Once generated, these embeddings are stored in a database for later use in authentication.
 
