@@ -1,4 +1,4 @@
-# VoicePassport: Your Trusted Voice Authentication Companion 🎙️🔒
+# VoicePassport: Your Trusted Voice Authentication Solution 🎙️🔐
 
 <img width="auto" height="250px" align="left" src="./doc/voice_passport_logo.PNG" />
 
@@ -7,6 +7,8 @@
 🔍🔐 Using these voice embeddings, VoicePassport employs a similarity search mechanism to authenticate users. By comparing the voice embeddings extracted from an input voice sample with those stored in its database, VoicePassport can determine the likelihood of a match, thereby verifying the identity of the user.
 
 💼💬 VoicePassport offers a reliable and efficient means of authentication, enabling seamless user access to various applications and services while ensuring a high level of security. With its innovative approach to voice-based authentication, VoicePassport provides a convenient and dependable solution for organizations seeking robust identity verification mechanisms.
+
+🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
 
 <p align="center">
   <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white" />
@@ -110,30 +112,7 @@ In summary, QDrant provides a comprehensive and highly efficient solution for ma
 
 ## Installation
 
-## Project Setup
-
-Below is the order in which tasks should be executed to set up the project:
-
-1. **Upload Contract ABI to MinIO**:
-   ```bash
-   rake voicepassport:upload_contract_abi_to_minio
-   ```
-2. **Build and Push Apache Airflow Image**:
-   ```bash
-   rake voicepassport:build_and_push_airflow_image
-   ```
-3. **Build and Push VoicePassport API Image**:
-   ```bash
-   rake voicepassport:build_and_push_voice_passport_api_image
-   ```
-4. **Deploy Architecture**:
-   ```bash
-   rake voicepassport:deploy
-   ```
-5. **Create Users in Apache Airflow**:
- ```bash
- rake voicepassport:create_apache_airflow_users
-   ```
+In this section I will provide an explanation about how to setup the whole project architecture.
 
 ### Deploy VoiceIdVerifier DApp on Polygon PoS Blockhain
 
@@ -198,7 +177,6 @@ VoiceIDVerifier
   5 passing (4s)
 ```
 
-
 You can deploy your own VoiceIdVerifier DApp instance using the following command:
 
 ```
@@ -212,21 +190,95 @@ cd VoiceIdVerifierDapp && npx hardhat run --network amoy scripts/deploy.ts
 VoiceIDVerifier contract deployed to 0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
 ```
 
+### Environment configuration
+
+It is necessary preparing the environment file called `.env` placed at the root folder which contains a lot of params to configure the services used in the architecture
+
+```
+## QDrant Configuration
+QDRANT_URI=http://voice_passport_qdrant:6333
+QDRANT_API_KEY=
+QDRANT_COLLECTION=user_voice_embeddings
+
+## VoiceIdVerifierDApp - Alchemy - Polygon PoS
+VOICE_ID_VERIFIER_HTTP_PROVIDER=https://polygon-amoy.g.alchemy.com/v2/api_token
+VOICE_ID_VERIFIER_CALLER_ADDRESS=CALLER_ADDRESS
+VOICE_ID_VERIFIER_CALLER_PRIVATE_KEY=PRIVATE_KEY
+VOICE_ID_VERIFIER_CONTRACT_ADDRESS=0xb23286ffEFa312CB6e828d203BB4a9FF85ee61DD
+VOICE_ID_VERIFIER_CONTRACT_ABI_NAME=VoiceIDVerifier.json
+....................
+....................
+```
+
+### Platform Setup
+
+Below is the order in which tasks should be executed to set up the project:
+
+1. **Upload Contract ABI to MinIO**:
+   ```bash
+   rake voicepassport:upload_contract_abi_to_minio
+   ```
+2. **Build and Push Apache Airflow Image**:
+   ```bash
+   rake voicepassport:build_and_push_airflow_image
+   ```
+3. **Build and Push VoicePassport API Image**:
+   ```bash
+   rake voicepassport:build_and_push_voice_passport_api_image
+   ```
+4. **Deploy Architecture**:
+   ```bash
+   rake voicepassport:deploy
+   ```
+5. **Create Users in Apache Airflow**:
+  ```bash
+  rake voicepassport:create_apache_airflow_users
+  ```
+
 ## Screenshots 📷
 Here are some screenshots that demonstrate the functionality of Voice Passport:
 
+It is possible to manage the information stored in QDrant by accessing its dashboard. We can visualize the created collections and stored embeddings, and even perform similarity searches.
 <p align="center">
   <img src="./doc/snapshots/picture_1.PNG" />
-  <img src="./doc/snapshots/picture_2.PNG" />
-  <img src="./doc/snapshots/picture_3.PNG" />
-  <img src="./doc/snapshots/picture_4.PNG" />
-  <img src="./doc/snapshots/picture_5.PNG" />
-  <img src="./doc/snapshots/picture_6.PNG" />
-  <img src="./doc/snapshots/picture_7.PNG" />
-  <img src="./doc/snapshots/picture_8.PNG" />
 </p>
 
+Each operator implemented in each of the Apache Airflow DAGs stores tracking records in MongoDB that we can analyze and track in order to inspect their operation.
+<p align="center">
+  <img src="./doc/snapshots/picture_2.PNG" />
+</p>
 
+Through the Apache Airflow dashboard, it is possible to monitor the operation of the DAGs and analyze their performance and various metrics.
+<p align="center">
+  <img src="./doc/snapshots/picture_3.PNG" />
+</p>
+  
+It's possible to examine details about task execution and the provided execution configuration.
+<p align="center">
+   <img src="./doc/snapshots/picture_4.PNG" />
+</p>
+  
+Through the Alchemy dashboard, it's possible to monitor the different transactions executed and various details regarding gas consumption or the block number where the transaction was mined.
+<p align="center">
+  <img src="./doc/snapshots/picture_5.PNG" />
+</p>
+
+It's also possible to visit the Polygon Block Explorer to obtain more details about the mined transaction.
+<p align="center">
+  <img src="./doc/snapshots/picture_6.PNG" />
+</p>
+
+The platform offers a REST API through which it's possible to interact with the system, initiate the registration of new users, and perform authentications.
+<p align="center">
+  <img src="./doc/snapshots/picture_7.PNG" />
+</p>
+
+Through the Apache Airflow UI, it's possible to examine the operation of the registered DAGs, identify the number of failed, queued, and completed tasks...
+<p align="center">
+  <img src="./doc/snapshots/picture_8.PNG" />
+  <img src="./doc/snapshots/picture_9.PNG" />
+</p>
+  
 ## Task Descriptions
 
 The following table provides descriptions and examples of tasks available in the Rakefile for deploying and managing your environment.
@@ -251,6 +303,32 @@ The following table provides descriptions and examples of tasks available in the
 
 To execute any of these tasks, use the `rake` command followed by the task name. For example, to deploy VoicePassport, run `rake voicepassport:deploy`.
 
+## Services Overview
+
+Below is a list of services available locally, each with its associated port number and a short description of its purpose. These services are used in the VoicePassport architecture for various functions, including data storage, database management, and API services. Understanding these services and their ports will be helpful when working with the VoicePassport environment.
+
+| Service Name                   | Ports                      | Purpose                                                                                        |
+|--------------------------------|----------------------------|------------------------------------------------------------------------------------------------|
+| voice_passport_minio1         |                            | Object and data storage                                                                       |
+| voice_passport_minio2         |                            | Object and data storage                                                                       |
+| voice_passport_minio3         |                            | Object and data storage                                                                       |
+| voice_passport_minio_haproxy  | 9000 (MinIO), 1936 (Stats) | Load balancer for MinIO                                                                       |
+| voice_passport_mongo          | 27017                      | NoSQL database                                                                                |
+| voice_passport_mongo_express  | 9001                       | Web interface to administer MongoDB                                                           |
+| voice_passport_redis          |                            | Cache storage and message broker for Apache Airflow                                            |
+| voice_passport_postgres       | 5432                       | Relational database for Apache Airflow                                                         |
+| voice_passport_pgadmin        | 9002                       | Web interface to administer PostgreSQL                                                         |
+| voice_passport_airflow_webserver| 9003                      | Apache Airflow web server for workflow management                                              |
+| voice_passport_celery_flower  | 9004 (Celery), 9005 (Web), 9006 (Stats) | Web-based tool to monitor and manage Celery clusters                                   |
+| voice_passport_airflow_scheduler| 9007                      | Task scheduler for Apache Airflow                                                              |
+| voice_passport_airflow_worker_1|                           | Apache Airflow task processing                                                                 |
+| voice_passport_api_service_1  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_2  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_3  |                            | API service for VoicePassport                                                                  |
+| voice_passport_api_service_haproxy| 9008 (API), 1937 (Stats)| Load balancer for VoicePassport API services                                                   |
+| voice_passport_qdrant         | 6333 (gRPC), 6334 (HTTP)  | Database for storing and querying vectors                                                      |
+
+
 ## Contribution
 Contributions to VoicePassport Architecture are highly encouraged! If you're interested in adding new features, resolving bugs, or enhancing the project's functionality, please feel free to submit pull requests.
 
@@ -261,10 +339,15 @@ This project is licensed under the [MIT License](LICENSE).
 VoicePassport Architecture is developed and maintained by **Sergio Sánchez Sánchez** (Dream Software). Special thanks to the open-source community and the contributors who have made this project possible.
 If you have any questions, feedback, or suggestions, feel free to reach out at dreamsoftware92@gmail.com.
 
+## Acknowledgements 🙏
+
+🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
+
 ## Please Share & Star the repository to keep me motivated.
-  <a href = "https://github.com/sergio11/voice_passport_architecture/stargazers">
-     <img src = "https://img.shields.io/github/stars/sergio11/voice_passport_architecture" />
-  </a>
+
+<a href = "https://github.com/sergio11/voice_passport_architecture/stargazers">
+   <img src = "https://img.shields.io/github/stars/sergio11/voice_passport_architecture" />
+</a>
 
 
 
