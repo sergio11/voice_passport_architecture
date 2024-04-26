@@ -54,6 +54,7 @@
 * **🔗 Web3**: Python library for interacting with Ethereum blockchain.
 * **📝 Solidity**: Programming language for writing smart contracts on the Ethereum blockchain.
 * **🟣 Polygon PoS**: Scalable Ethereum sidechain for fast and low-cost transactions.
+* **🔬 Alchemy**: An analytics platform that provides insights into blockchain transactions, allowing users to monitor and analyze transaction data on the Ethereum blockchain.
 * **📦 MinIO**: Object storage service for storing voice samples files.
 * **🍃 MongoDB**: NoSQL database for storing user metadata and authentication data.
 * **🌀 Apache Airflow**: Workflow management tool for automation of audio processing tasks and database integration.
