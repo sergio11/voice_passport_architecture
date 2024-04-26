@@ -17,7 +17,6 @@ class VerifyVoiceIdOperator(BaseWeb3CustomOperator):
     - **kwargs: Additional keyword arguments.
     """
     
-
     @apply_defaults
     def __init__(
         self,

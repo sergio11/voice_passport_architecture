@@ -3,6 +3,16 @@ from operators.base_custom_operator import BaseCustomOperator
 from qdrant_client import QdrantClient, http
 
 class QDrantEmbeddingsOperator(BaseCustomOperator):
+    """
+    Custom Apache Airflow operator for upserting voice embeddings into the QDrant vector database.
+    
+    :param qdrant_uri: The URI of the QDrant service.
+    :type qdrant_uri: str
+    :param qdrant_api_key: The API key for authentication with the QDrant service.
+    :type qdrant_api_key: str
+    :param qdrant_collection: The name of the collection in which the embeddings will be upserted.
+    :type qdrant_collection: str
+    """
 
     @apply_defaults
     def __init__(
@@ -18,10 +28,20 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
         self.qdrant_collection = qdrant_collection
 
     def _initialize_qdrant_client(self):
+        """
+        Initialize the QDrant client with the provided URI and API key.
+        
+        :return: Initialized QDrant client.
+        """
         # Initialize QDrant client
         return QdrantClient(url=self.qdrant_uri, api_key=self.qdrant_api_key)
 
     def _create_or_verify_collection(self, client):
+        """
+        Create or verify the existence of the specified collection in QDrant.
+        
+        :param client: Initialized QDrant client.
+        """
         # Get collections response
         collections_response = client.get_collections()
         # Extract collection names
@@ -36,10 +56,23 @@ class QDrantEmbeddingsOperator(BaseCustomOperator):
             client.create_collection(self.qdrant_collection, vectors_config)
             
     def _upsert_embeddings(self, client, id, embeddings):
+        """
+        Upsert the provided embeddings into the specified collection in QDrant.
+        
+        :param client: Initialized QDrant client.
+        :param id: Unique identifier for the embeddings.
+        :param embeddings: List of voice embeddings.
+        """
         # Upsert embeddings into the collection
         client.upsert(self.qdrant_collection, [{"id": id, "vector": embeddings.tolist()}])
 
     def execute(self, context):
+       """
+        Execute the QDrant operator.
+        
+        :param context: Task execution context.
+        :return: Dictionary containing the voice file ID.
+       """
        # Log the start of the execution
        self._log_to_mongodb(f"Starting execution of QDrantOperator", context, "INFO")
        args = context['task_instance'].xcom_pull(task_ids='generate_voice_embedding_task')
