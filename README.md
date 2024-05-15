@@ -45,6 +45,10 @@
   <img width="auto" height="250px" src="./doc/airflow_logo.png" />
 </p>
 
+## More Details 📝
+
+For comprehensive information about this project, check out this [Medium article](https://sanchezsanchezsergio418.medium.com/voicepassport-secure-voice-identity-verification-using-vector-databases-and-blockchain-technology-bd8dccec44e6).
+
 ## 🛠️ Technologies Used
 
 * **🎤 Resemblyzer**: Advanced voice analysis tool for generating voice embeddings.
