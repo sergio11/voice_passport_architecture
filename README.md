@@ -10,6 +10,10 @@
 
 🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
 
+## ⚠️ Disclaimer  
+
+**VoicePassport** is an **experimental and educational project** designed to explore the capabilities of **voice authentication** and **speaker recognition technologies**. This system leverages **Resemblyzer** for voice processing and embedding generation, aimed at providing a **proof-of-concept** solution for identity verification through voice.  
+
 <p align="center">
   <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white" />
   <img src="https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=Apache%20Airflow&logoColor=white" />
