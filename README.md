@@ -1,12 +1,12 @@
-# VoicePassport: Your Trusted Voice Authentication Solution 🎙️🔐
+# VoicePassport: Exploring Voice-Based Authentication 🎙️🔐
 
 <img width="auto" height="300px" align="left" src="./doc/voice_passport_logo.webp" />
 
-🔒🗣️ VoicePassport is a robust and secure voice authentication system designed to ensure the authenticity of users through their unique voiceprints. Powered by Resemblyzer, VoicePassport leverages advanced voice processing technology to generate voice embeddings, which are compact numerical representations of voice characteristics. These embeddings capture the distinctive features of an individual's voice in a highly accurate and secure manner.
+🔒🗣️ **VoicePassport** is a proof-of-concept project exploring user authentication through unique voiceprints. Leveraging technologies like **Resemblyzer**, it generates *voice embeddings*—compact numerical representations of vocal features—to capture the distinctive traits of an individual's voice.
 
-🔍🔐 Using these voice embeddings, VoicePassport employs a similarity search mechanism to authenticate users. By comparing the voice embeddings extracted from an input voice sample with those stored in its database, VoicePassport can determine the likelihood of a match, thereby verifying the identity of the user.
+🔍🔐 These embeddings enable a similarity-based verification process. By comparing a new voice sample with stored entries in a vector database, VoicePassport estimates the likelihood of a match and determines whether a user's identity can be confirmed.
 
-💼💬 VoicePassport offers a reliable and efficient means of authentication, enabling seamless user access to various applications and services while ensuring a high level of security. With its innovative approach to voice-based authentication, VoicePassport provides a convenient and dependable solution for organizations seeking robust identity verification mechanisms.
+💼💬 Designed for experimentation and learning, VoicePassport offers a hands-on framework for investigating voice biometrics and secure authentication methods. It serves as a foundation for further exploration in the areas of machine learning, voice processing, and identity verification.
 
 🙏 I would like to extend my heartfelt gratitude to Karan Shingde for his insightful article published on Medium titled ["Build an Audio-driven Speaker Recognition System Using Open Source Technologies: resemblyzer and pyAudioAnalysis"](https://medium.com/@karanshingde/build-an-audio-driven-speaker-recognition-system-using-open-source-technologies-resemblyzer-and-6499cf0246eb). His comprehensive guide served as a significant source of inspiration and a crucial starting point for developing the VoicePassport Architecture project. Karan's expertise and dedication have been instrumental in shaping my understanding and implementation of speaker recognition technologies. I am truly thankful for his invaluable contribution to the field and for sharing his knowledge with the community. 🚀
 
